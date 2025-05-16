@@ -1,0 +1,133 @@
+.pomodoro {
+  background-color: #FEF9F1;
+  border: 2px solid #CDCDCD;
+  border-radius: 10px;
+  display: inline-block;
+  padding: 10px;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+/* Buttons */
+
+.button {
+  border-radius: 25px;
+  border: 2px solid #1E1E1E;
+  font-family: 'Gabarito';
+  font-weight: 500;
+  color: #1E1E1E;
+  margin: 0 5px;
+  transition: all 0.2s ease;
+  padding: 5px;
+
+  /* Start with large padding and reduce it to 10px at small widths */
+  padding-left: clamp(10px, 4vw, 25px);
+  padding-right: clamp(10px, 4vw, 25px);
+
+  /* Keep font-size large unless we’re below 400px */
+  font-size: 18px;
+}
+
+/* Scale font size down only when screen is narrower than 400px */
+@media (max-width: 400px) {
+  .button {
+    font-size: clamp(14px, 4vw, 18px);
+  }
+}
+
+
+.button:focus {
+  outline: none;
+}
+
+.session,
+.short,
+.long {
+  background-color: #FFD8DF;
+}
+
+.active {
+  background-color: #1E1E1E;
+  color: #FEF9F1;
+}
+
+/* Progress circles */
+
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 13px;
+  flex-wrap: wrap;
+}
+
+.circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #1E1E1E;
+  background-color: #747474;
+}
+
+.filled {
+  background-color: #FFD8DF;
+}
+
+/* Timer text */
+
+.time {
+  font-family: 'Gabarito';
+  font-weight: 700;
+  font-size: clamp(40px, 8vw, 60px); /* Responsive font size */
+  color: #1E1E1E;
+  text-align: center;
+  margin: 0;
+}
+
+/* Controls */
+
+.control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap; /* Wrap on smaller screens */
+}
+
+.start {
+  border-radius: 25px;
+  font-size: clamp(16px, 4vw, 20px);
+  padding: 7px 20px;
+  background-color: #1E1E1E;
+  color: #FEF9F1;
+  border: none;
+}
+
+.reset,
+.edit {
+  padding: 0;
+  margin: 0;
+  background-color: #FEF9F1;
+  border: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+  .button {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 14px;
+  }
+
+  .control {
+    gap: 0.3rem;
+  }
+
+  .start {
+    padding: 5px 15px;
+  }
+}
