@@ -41,3 +41,19 @@ button:focus-visible {
       "calendar calendar";
   }
 }
+
+@media (max-width: 500px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .workspace-grid {
+    grid-template-columns: 1.3fr 1.7fr !important; /* Only two columns */
+    grid-template-areas:
+      "timer task"
+      "spotify task"
+      "calendar calendar"
+      "calendar calendar"
+      "calendar calendar"
+      "calendar calendar";
+  }
+}

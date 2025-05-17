@@ -13,7 +13,7 @@
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* prevent scrollbars on the container itself */
+  overflow: hidden;
 }
 
 .title {
@@ -47,9 +47,9 @@
 .grid {
   display: flex;
   flex: 1 1 auto;
-  /* min-height: 120px;  Remove or reduce this if overflow occurs */
+  /* min-height: 120px;*/
   border-top: 1px solid #ccc;
-  overflow-y: auto; /* scroll inside if content overflows */
+  overflow-y: auto;
   max-height: 100%;
 }
 

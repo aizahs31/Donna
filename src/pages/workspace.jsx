@@ -28,12 +28,14 @@ const Workspace = () => {
         `,
       }}
     >
-      {/* Pomodoro Timer */}
+      
       <div
         style={{
+          backgroundColor: '#FEF9F1',
+          border: '2px solid #CDCDCD',
+          borderRadius: '10px',
+          padding: '1rem',
           gridArea: 'timer',
-          transform: 'scale(0.95)',
-          transformOrigin: 'top left',
           width: '100%',
           height: '100%',
           boxSizing: 'border-box',
@@ -42,7 +44,6 @@ const Workspace = () => {
         <StartTimer />
       </div>
 
-      {/* Spotify */}
       <div
         style={{
           gridArea: 'spotify',
@@ -53,8 +54,7 @@ const Workspace = () => {
       >
         <ShowSpotify />
       </div>
-
-      {/* Tasks */}
+      
       <div
         style={{
           gridArea: 'task',
@@ -73,7 +73,6 @@ const Workspace = () => {
         <Task />
       </div>
 
-      {/* Time */}
       <div
         className="hide-on-mobile"
         style={{
@@ -86,7 +85,6 @@ const Workspace = () => {
         <DisplayTime />
       </div>
 
-      {/* Calendar */}
       <div
         style={{
           gridArea: 'calendar',
@@ -101,7 +99,6 @@ const Workspace = () => {
         <Calendar />
       </div>
 
-      {/* Donna */}
       <div
         className="hide-on-mobile"
         style={{

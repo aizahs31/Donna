@@ -56,7 +56,6 @@ const Donna = () => {
     lineHeight: '1.2',
   };
 
-  // Updated styles for input + buttons container
   const inputWrapperStyle = {
     position: 'relative',
     marginTop: 'auto',
@@ -64,7 +63,7 @@ const Donna = () => {
 
   const inputStyle = {
     width: '100%',
-    padding: '0.75rem 8rem 0.75rem 1rem', // increased right padding for buttons
+    padding: '0.75rem 8rem 0.75rem 1rem',
     backgroundColor: '#fddde5',
     borderRadius: '2rem',
     border: 'none',
@@ -96,7 +95,7 @@ const Donna = () => {
 
   const summarizeButtonStyle = {
     position: 'absolute',
-    right: '6.5rem',  // slightly moved right for spacing
+    right: '6.5rem',
     top: '50%',
     transform: 'translateY(-50%)',
     backgroundColor: '#D53169',

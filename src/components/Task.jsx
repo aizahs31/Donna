@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const Task = () => {
   const [tasks, setTasks] = useState([
@@ -12,9 +12,7 @@ const Task = () => {
     updated[index].completed = !updated[index].completed;
     setTasks(updated);
   };
-
   
-
   const titleStyle = {
     fontWeight: '600',
     fontSize: '1.125rem',
