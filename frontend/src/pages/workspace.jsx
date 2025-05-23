@@ -39,6 +39,7 @@ const Workspace = () => {
           width: '100%',
           height: '100%',
           boxSizing: 'border-box',
+          zIndex: 1,
         }}
       >
         <StartTimer />
