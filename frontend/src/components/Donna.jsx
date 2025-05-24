@@ -164,7 +164,7 @@ const Donna = () => {
       <h2 style={headerStyle}>Donna</h2>
       <div style={chatBoxStyle}>
         {messages.map((msg, index) =>
-          msg.type === 'user' ? (
+          msg.from === 'user' ? (
             <div key={index} style={userMsgStyle}>{msg.text}</div>
           ) : (
             <div key={index} style={botMsgStyle}>{msg.text}</div>
