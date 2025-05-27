@@ -15,7 +15,7 @@ const Donna = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/chat", {
+      const res = await fetch("http://localhost:3000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -92,7 +92,7 @@ const Donna = () => {
   const inputWrapperStyle = {
     marginTop: 'auto',
     display: 'flex',
-    flexDirection: 'column', // change to column
+    flexDirection: 'column',
     gap: '0.5rem',
     alignItems: 'center',
   }
@@ -167,7 +167,7 @@ const Donna = () => {
           msg.from === 'user' ? (
             <div key={index} style={userMsgStyle}>{msg.text}</div>
           ) : (
-            <div key={index} style={botMsgStyle}>{msg.text}</div>
+            <div key={index} style={botMsgStyle} dangerouslySetInnerHTML={{ __html: msg.text }} />
           )
         )}
       </div>
