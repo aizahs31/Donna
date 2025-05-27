@@ -1,380 +1,336 @@
-.button {
-  border-radius: 25px;
-  border: 2px solid #1E1E1E;
-  font-family: 'Gabarito';
-  font-weight: 500;
-  color: #1E1E1E;
-  margin: 0 5px;
-  transition: all 0.2s ease;
-  padding: 5px;
-  padding-left: clamp(10px, 4vw, 25px);
-  padding-right: clamp(10px, 4vw, 25px);
-  font-size: 18px;
+/* Moved from Pomodoro.jsx <style jsx> */
+.timerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* gap: 15px; */
+    height: 100%;
 }
 
-/* Scale font size down only when screen is narrower than 400px
-@media (max-width: 500px) {
-  .button {
-    font-size: clamp(14px, 4vw, 18px);
-  }
-} */
-
-.button:focus {
-  outline: none;
+.buttonGroup {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 18px;
 }
 
-.session,
-.short,
-.long {
-  background-color: #FFD8DF;
+.timerButton {
+    border-radius: 20px;
+    border: 2px solid #1E1E1E;
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-weight: 500;
+    color: #1E1E1E;
+    transition: all 0.2s ease, padding 0.2s cubic-bezier(0.4,0,0.2,1);
+    padding: 6px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #FFD8DF;
+    min-width: 60px;
+    white-space: nowrap;
 }
 
-.active {
-  background-color: #1E1E1E;
-  color: #FEF9F1;
+.timerButton:focus {
+    outline: none;
 }
 
-.progress {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 13px;
-  flex-wrap: wrap;
+.timerButton:hover {
+    transform: translateY(-1px);
 }
 
-.circle {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid #1E1E1E;
-  background-color: #747474;
+.timerButton.active {
+    background-color: #1E1E1E;
+    color: #FEF9F1;
 }
 
-.filled {
-  background-color: #FFD8DF;
+.shortBreakBtn {
+    padding-left: 25px;
+    padding-right: 25px;
+    transition: padding 0.2s cubic-bezier(0.4,0,0.2,1);
 }
-
-.timeControlContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
+.longBreakBtn {
+    padding-left: 27px;
+    padding-right: 27px;
+    transition: padding 0.2s cubic-bezier(0.4,0,0.2,1);
 }
-
-.time {
-  flex: 1;
-  font-family: 'Gabarito';
-  font-size: 3rem;
-  font-weight: 700;
-  color: #1E1E1E;
-  text-align: center;
-  margin: 0;
+@media (max-width: 900px) {
+    .timerButton {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .shortBreakBtn {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .longBreakBtn {
+        padding-left: 17px;
+        padding-right: 17px;
+    }
 }
-
-.control {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
+@media (max-width: 700px) {
+    .timerButton {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    .shortBreakBtn {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .longBreakBtn {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }
-
-.start {
-  border-radius: 25px;
-  /* font-size: clamp(16px, 4vw, 20px); */
-  padding: 7px 20px;
-  background-color: #1E1E1E;
-  color: #FEF9F1;
-  border: none;
-}
-
-.reset,
-.edit {
-  padding: 0;
-  margin: 0;
-  background-color: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-}
-.timer-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #FEF9F1;
-  border-radius: 15px;
-  border: 2px solid #1E1E1E;
-  box-sizing: border-box;
-}
-
-.timer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  height: 100%;
-}
-
-.button-group {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.timer-button {
-  border-radius: 20px;
-  border: 2px solid #1E1E1E;
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-weight: 500;
-  color: #1E1E1E;
-  transition: all 0.2s ease;
-  padding: 6px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  background-color: #FFD8DF;
-  min-width: 60px;
-}
-
-.timer-button:focus {
-  outline: none;
-}
-
-.timer-button:hover {
-  transform: translateY(-1px);
-}
-
-.timer-button.active {
-  background-color: #1E1E1E;
-  color: #FEF9F1;
+@media (max-width: 480px) {
+    .timerButton {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
 }
 
 .progress {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
 }
 
-.progress.completed {
-  animation: completedPulse 0.5s ease-in-out;
+.completed {
+    animation: completedPulse 0.5s ease-in-out;
 }
 
 @keyframes completedPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .circle {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 2px solid #1E1E1E;
-  background-color: #747474;
-  transition: all 0.3s ease;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid #1E1E1E;
+    background-color: #747474;
+    transition: all 0.3s ease;
 }
 
-.circle.filled {
-  background-color: #FFD8DF;
+.filled {
+    background-color: #FFD8DF;
 }
 
-.progress.completed .circle.filled {
-  background-color: #FF69B4;
-  border-color: #FF69B4;
-  box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+.progress.completed .filled {
+    background-color: #FF69B4;
+    border-color: #FF69B4;
+    box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
 }
 
-.time-display {
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #1E1E1E;
-  text-align: center;
-  margin: 5px 0;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.timeRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 24px;
 }
 
-.control-buttons {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
+.timeDisplay {
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #1E1E1E;
+    text-align: center;
+    margin: 5px 0;
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
 }
 
-.start-btn {
-  border-radius: 20px;
-  padding: 8px 20px;
-  background-color: #1E1E1E;
-  color: #FEF9F1;
-  border: none;
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.controlButtons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
-.start-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.startBtn {
+    border-radius: 20px;
+    padding: 8px 20px;
+    background-color: #1E1E1E;
+    color: #FEF9F1;
+    border: none;
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.icon-btn {
-  padding: 4px;
-  margin: 0;
-  background-color: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 50%;
+.startBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.icon-btn:hover {
-  transform: scale(1.1);
-  background-color: rgba(30, 30, 30, 0.1);
+.iconBtn {
+    padding: 4px;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 50%;
 }
 
-.edit-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 15px;
-  z-index: 10;
+.iconBtn:hover {
+    transform: scale(1.1);
+    background-color: rgba(30, 30, 30, 0.1);
 }
 
-.edit-modal {
-  background-color: #FEF9F1;
-  padding: 20px;
-  border-radius: 15px;
-  border: 2px solid #1E1E1E;
-  width: 90%;
-  max-width: 300px;
-  animation: modalSlide 0.3s ease;
+.editOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    z-index: 10;
+}
+
+.editModal {
+    background-color: #FEF9F1;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #1E1E1E;
+    width: 90%;
+    max-width: 300px;
+    animation: modalSlide 0.3s ease;
 }
 
 @keyframes modalSlide {
-  from {
-      opacity: 0;
-      transform: scale(0.9);
-  }
-  to {
-      opacity: 1;
-      transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.edit-modal h3 {
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #1E1E1E;
-  margin: 0 0 15px 0;
-  text-align: center;
+.editModal h3 {
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1E1E1E;
+    margin: 0 0 15px 0;
+    text-align: center;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 15px;
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
 }
 
-.input-group label {
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-weight: 500;
-  color: #1E1E1E;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.inputGroup label {
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-weight: 500;
+    color: #1E1E1E;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.input-group input {
-  border-radius: 10px;
-  border: 2px solid #1E1E1E;
-  padding: 8px 12px;
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-size: 14px;
-  background-color: #FFD8DF;
-  color: #1E1E1E;
-  transition: all 0.2s ease;
+.inputGroup input {
+    border-radius: 10px;
+    border: 2px solid #1E1E1E;
+    padding: 8px 12px;
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-size: 14px;
+    background-color: #FFD8DF;
+    color: #1E1E1E;
+    transition: all 0.2s ease;
 }
 
-.input-group input:focus {
-  outline: none;
-  background-color: #FEF9F1;
-  box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.1);
+.inputGroup input:focus {
+    outline: none;
+    background-color: #FEF9F1;
+    box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.1);
 }
 
-.modal-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+.modalButtons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
 
-.modal-buttons button {
-  border-radius: 15px;
-  border: 2px solid #1E1E1E;
-  padding: 6px 15px;
-  font-family: 'Gabarito', Arial, sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.modalButtons button {
+    border-radius: 15px;
+    border: 2px solid #1E1E1E;
+    padding: 6px 15px;
+    font-family: 'Gabarito', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.cancel-btn {
-  background-color: #747474;
-  color: #FEF9F1;
+.cancelBtn {
+    background-color: #747474;
+    color: #FEF9F1;
 }
 
-.apply-btn {
-  background-color: #1E1E1E;
-  color: #FEF9F1;
+.applyBtn {
+    background-color: #1E1E1E;
+    color: #FEF9F1;
 }
 
-.modal-buttons button:hover {
-  transform: translateY(-1px);
+.modalButtons button:hover {
+    transform: translateY(-1px);
 }
 
 @media (max-width: 480px) {
-  .timer-container {
-      padding: 10px;
-  }
+    .timerContainer {
+        padding: 10px;
+    }
 
-  .time-display {
-      font-size: 1.8rem;
-  }
+    .timeDisplay {
+        font-size: 1.8rem;
+    }
 
-  .timer-button {
-      padding: 4px 10px;
-      font-size: 12px;
-      min-width: 50px;
-  }
+    .timerButton {
+        padding: 4px 10px;
+        font-size: 12px;
+        min-width: 50px;
+    }
 
-  .control-buttons {
-      gap: 8px;
-  }
+    .controlButtons {
+        gap: 8px;
+    }
 
-  .start-btn {
-      padding: 6px 15px;
-      font-size: 14px;
-  }
+    .startBtn {
+        padding: 6px 15px;
+        font-size: 14px;
+    }
+
+    .timeRow {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .timeDisplay {
+        font-size: 2rem;
+        min-width: 0;
+    }
 }
