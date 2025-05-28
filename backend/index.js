@@ -10,7 +10,7 @@ const { getAuthUrl, getTokens, oauth2Client } = require('./auth');
 const app = express();
 const port = 3000;
 
-// ✅ Fix CORS to match Vite frontend port
+// Fix CORS to match Vite frontend port
 app.use(cors({
   origin: "http://localhost:5173", // <- This must match your frontend
   methods: ["POST", "GET"],
@@ -82,7 +82,7 @@ app.get('/auth/callback', async (req, res) => {
 
 
 
-
+// Calendar
 
 app.get('/events', async (req, res) => {
   try {
