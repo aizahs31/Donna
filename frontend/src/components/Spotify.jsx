@@ -30,7 +30,6 @@ export default function ShowSpotify() {
             <iframe
                 style={{ borderRadius: '12px', width: '350px', height: '152px', maxWidth: 600, border: 'none' }}
                 src={embedUrl}
-                frameBorder="0"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 loading="lazy"
                 allowFullScreen=""
@@ -88,6 +87,7 @@ export default function ShowSpotify() {
                     width: '100vw',
                     height: '100vh',
                     background: 'rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(5px)',
                     zIndex: 1000,
                     display: 'flex',
                     alignItems: 'center',

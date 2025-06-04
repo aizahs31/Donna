@@ -30,21 +30,6 @@
   margin: 0;
 }
 
-.connectButton {
-  background-color: #f9c7d3;
-  border: 2px solid #1E1E1E;
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.connectButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
 .tabs {
   display: flex;
   gap: 1rem;
@@ -84,7 +69,7 @@
 }
 
 .event {
-  background-color: #f9c7d3;
+  background-color: #FFD8DF;
   border-radius: 8px;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
@@ -100,4 +85,154 @@
 .eventTitle {
   font-size: 1rem;
   line-height: 1.2;
+}
+
+.setEventButton {
+  background-color: #FFD8DF;
+  border: 2px solid #1E1E1E;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.setEventButton:hover {
+  background-color: #1E1E1E;
+  color: #FEF9F1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.eventPopupOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.eventPopupModal {
+  background: #FEF9F1;
+  border-radius: 15px;
+  border: 2px solid #1E1E1E;
+  padding: 24px 20px 18px 20px;
+  min-width: 270px;
+  max-width: 95vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  animation: modalSlide 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.eventPopupModal h3 {
+  font-family: 'Gabarito', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1E1E1E;
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.eventForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.eventForm label {
+  font-family: 'Gabarito', Arial, sans-serif;
+  font-weight: 500;
+  color: #1E1E1E;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eventForm input,
+.eventForm select {
+  border-radius: 10px;
+  border: 2px solid #1E1E1E;
+  padding: 8px 12px;
+  font-family: 'Gabarito', Arial, sans-serif;
+  font-size: 14px;
+  background-color: #FFD8DF;
+  color: #1E1E1E;
+  transition: all 0.2s ease;
+}
+
+.eventForm input:focus,
+.eventForm select:focus {
+  outline: none;
+  background-color: #FEF9F1;
+  box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.1);
+}
+
+.eventFormButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  background-color: #747474;
+  color: #FEF9F1;
+  border-radius: 15px;
+  border: 2px solid #1E1E1E;
+  padding: 6px 15px;
+  font-family: 'Gabarito', Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.applyBtn {
+  background-color: #1E1E1E;
+  color: #FEF9F1;
+  border-radius: 15px;
+  border: 2px solid #1E1E1E;
+  padding: 6px 15px;
+  font-family: 'Gabarito', Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.eventFormButtons button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .eventPopupModal {
+    padding: 12px 6px 10px 6px;
+    min-width: 0;
+    width: 98vw;
+  }
+  .eventForm input, .eventForm select {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  .eventFormButtons button {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
 }

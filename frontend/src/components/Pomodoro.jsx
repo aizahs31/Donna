@@ -192,10 +192,9 @@ export default function StartTimer({ sessionTime = 25, shortBreak = 5, longBreak
                                 Session:
                                 <input
                                     type="number"
-                                    min="0"
                                     max="120"
                                     value={tempSession}
-                                    onChange={e => setTempSession(Math.max(1, Number(e.target.value)))}
+                                    onChange={e => setTempSession(e.target.value)}
                                 />
                             </label>
 
@@ -203,10 +202,9 @@ export default function StartTimer({ sessionTime = 25, shortBreak = 5, longBreak
                                 Short Break:
                                 <input
                                     type="number"
-                                    min="0"
                                     max="60"
                                     value={tempShort}
-                                    onChange={e => setTempShort(Math.max(1, Number(e.target.value)))}
+                                    onChange={e => setTempShort(e.target.value)}
                                 />
                             </label>
 
@@ -214,10 +212,9 @@ export default function StartTimer({ sessionTime = 25, shortBreak = 5, longBreak
                                 Long Break:
                                 <input
                                     type="number"
-                                    min="0"
                                     max="120"
                                     value={tempLong}
-                                    onChange={e => setTempLong(Math.max(1, Number(e.target.value)))}
+                                    onChange={e => setTempLong(e.target.value)}
                                 />
                             </label>
                         </div>

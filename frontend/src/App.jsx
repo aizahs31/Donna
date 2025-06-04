@@ -1,11 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Workspace from "./pages/workspace";
+import Landing from "./pages/landing";
 
 function App(){
     return(
-        // Overflow!
-        <div style={{ backgroundColor: '#E3EBFF', height: '100vh', width: '100vw', overflow: 'hidden'}}>
-            <Workspace />
-        </div>    
+        <Router>
+            <Routes>
+                <Route path="/workspace" element={<Workspace />} />
+                <Route path="/" element={<Landing />} />
+            </Routes>
+        </Router>
     )
 }
 
