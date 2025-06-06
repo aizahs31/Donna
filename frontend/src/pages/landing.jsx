@@ -1,12 +1,23 @@
 import { useEffect, useState, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import ScrollReveal from '../components/ScrollReveal';
+
 
 export default function Landing() {
   const [loading, setLoading] = useState(true);
   const [showAfterLoad, setShowAfterLoad] = useState(false);
   const [flowers, setFlowers] = useState([]);
   const flowerId = useRef(0);
+  const logoRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Use Framer Motion's useScroll with the custom container
+  const { scrollY } = useScroll({ container: containerRef });
+  const logoOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const logoScale = useTransform(scrollY, [0, 300], [1, 0.8]);
+  const logoY = useTransform(scrollY, [0, 300], [0, 50]);
+  const logoFilter = useTransform(scrollY, [0, 300], ["blur(0px)", "blur(10px)"]);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 2000);
@@ -23,7 +34,7 @@ export default function Landing() {
   useEffect(() => {
     if (!showAfterLoad) return;
     const interval = setInterval(() => {
-      const flowerTypes = ["flower1.png", "flower2.png", "flower3.png"];
+      const flowerTypes = ["flower1.png", "flower2.png", "flower3.png", "flower4.png", "flower5.png", "flower6.png"];
       setFlowers((prev) => [
         ...prev,
         {
@@ -47,8 +58,40 @@ export default function Landing() {
     }
   }, [flowers, showAfterLoad]);
 
+  // Add controlled scroll behavior
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const scrollAmount = 350;
+      const direction = Math.sign(e.deltaY);
+      container.scrollBy({
+        top: direction * scrollAmount,
+        behavior: 'smooth'
+      });
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, []);
+
   return (
-    <div>
+    <div
+      ref={containerRef}
+      style={{
+        overflowX: "hidden",
+        overflowY: "scroll",
+        height: "100vh",
+        position: "fixed",
+        width: "100%",
+        top: 0,
+        left: 0,
+        scrollBehavior: "smooth"
+      }}
+      className="smooth-scroll"
+    >
       <AnimatePresence>
         {loading && (
           <motion.div
@@ -85,21 +128,21 @@ export default function Landing() {
       <AnimatePresence>
         {showAfterLoad && (
           <>
-            {/* Upper branch background - now with fade-in animation */}
+            {/* Upper branch background - now fixed at the top */}
             <motion.img
               src="images/upper.png"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, ease: [0.77, 0, 0.18, 1] }}
+              transition={{ duration: 1, ease: [0.77, 0, 0.18, 1] }}
               style={{
-                position: "absolute",
+                position: "fixed",
                 top: 0,
                 left: 0,
                 width: "500px",
                 maxWidth: "50vw",
                 maxHeight: "50vh",
                 height: "auto",
-                zIndex: 0,
+                zIndex: 10,
                 pointerEvents: "none",
                 userSelect: "none"
               }}
@@ -110,7 +153,7 @@ export default function Landing() {
               position: "fixed",
               left: 0,
               top: 0,
-              width: "100vw",
+              width: "100%",
               height: "100vh",
               pointerEvents: "none",
               zIndex: 0,
@@ -152,94 +195,147 @@ export default function Landing() {
                 />
               ))}
             </div>
-            {/* Popup animation only for logo and button */}
+            {/* Logo and button now scroll with the page, with animation */}
             <motion.div
+              ref={logoRef}
               className="after-load"
               initial={{ opacity: 0, y: 80 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 80 }}
-              transition={{ duration: 1, ease: [0.77, 0, 0.18, 1] }}
-              style={styles.afterLoad}
+              transition={{ duration: 1, ease: [0.2, 0.3, 0.2, 1] }}
+              style={{
+                ...styles.afterLoad,
+                position: "relative",
+                top: undefined,
+                left: undefined,
+                height: "100vh",
+                width: "100%",
+              }}
             >
-              <div className="logo" style={styles.logo}>
-                <img
-                  src="images/donnatext.png"
-                  alt="Donna"
-                  style={styles.donnaTextImg}
-                />
-                <p style={styles.assistantText}>
-                  Your personal assistant
-                </p>
-              </div>
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <motion.button
-                  onClick={() => window.location.href = 'http://localhost:3000/auth'}
-                  style={styles.connectButton}
-                  whileHover="hover"
-                  initial="rest"
-                  animate="rest"
-                  variants={{
-                    rest: { scale: 1 },
-                    hover: { scale: 1.06 }
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+                <motion.div 
+                  className="logo" 
+                  style={{
+                    ...styles.logo,
+                    opacity: logoOpacity,
+                    scale: logoScale,
+                    y: logoY,
+                    filter: logoFilter
                   }}
                 >
-                  <motion.span
-                    style={styles.buttonTextWrapper}
-                    variants={{
-                      rest: { color: '#1E1E1E' },
-                      hover: { color: '#FEF9F1' }
-                    }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <span style={styles.buttonText}>Continue with Google</span>
-                  </motion.span>
-                  <motion.span
-                    style={styles.buttonBg}
-                    variants={{
-                      rest: { scaleX: 0 },
-                      hover: { scaleX: 1 }
-                    }}
-                    transition={{ duration: 0.45, ease: [0.77, 0, 0.18, 1] }}
+                  <img
+                    src="images/donnatext.png"
+                    alt="Donna"
+                    style={styles.donnaTextImg}
                   />
-                </motion.button>
-                <style>{`
-                  .connect-btn-anim {
-                    position: relative;
-                    overflow: hidden;
-                    display: inline-flex;
-                    align-items: center;
-                  }
-                  .connect-btn-anim .btn-bg {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: #1E1E1E;
-                    border-radius: 50px;
-                    z-index: 1;
-                    pointer-events: none;
-                    transform-origin: left center;
-                    transition: transform 0.45s cubic-bezier(.77,0,.18,1);
-                  }
-                  .connect-btn-anim .btn-text {
-                    position: relative;
-                    z-index: 2;
-                    color: #1E1E1E;
-                    transition: color 0.2s;
-                  }
-                  .connect-btn-anim:hover .btn-bg {
-                    transform: scaleX(1);
-                  }
-                  .connect-btn-anim:hover .btn-text {
-                    color: #FEF9F1;
-                  }
-                `}</style>
+                  <p style={styles.assistantText}>
+                    Your personal assistant
+                  </p>
+                </motion.div>
+                <motion.div
+                  style={{
+                    opacity: logoOpacity,
+                    scale: logoScale,
+                    y: logoY,
+                    filter: logoFilter
+                  }}
+                >
+                  <motion.button
+                    onClick={() => window.location.href = 'http://localhost:3000/auth'}
+                    style={styles.connectButton}
+                    whileHover="hover"
+                    initial="rest"
+                    animate="rest"
+                    variants={{
+                      rest: { scale: 1 },
+                      hover: { scale: 1.06 }
+                    }}
+                  >
+                    <motion.span
+                      style={styles.buttonTextWrapper}
+                      variants={{
+                        rest: { color: '#1E1E1E' },
+                        hover: { color: '#FEF9F1' }
+                      }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <span style={styles.buttonText}>Continue with Google</span>
+                    </motion.span>
+                    <motion.span
+                      style={styles.buttonBg}
+                      variants={{
+                        rest: { scaleX: 0 },
+                        hover: { scaleX: 1 }
+                      }}
+                      transition={{ duration: 0.45, ease: [0.77, 0, 0.18, 1] }}
+                    />
+                  </motion.button>
+                </motion.div>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+      {showAfterLoad && (
+        <>
+          <div
+            style={{
+              position: "relative",
+              minHeight: "100vh",
+              width: "100%",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0 8vw",
+                boxSizing: "border-box"
+              }}
+            >
+              <ScrollReveal
+                scrollContainerRef={containerRef}
+                containerClassName="scroll-reveal-custom"
+                textClassName="scroll-reveal-text-custom"
+              >
+                Donna is your all-in-one personal workspace, powered by an intelligent AI assistant. It helps you stay organized and productive by handling tasks like scheduling meetings, setting reminders, taking notes, and more. Whether you're managing your day or planning ahead, Donna acts as your smart companion — always ready to assist.
+              </ScrollReveal>
+            </div>
+          </div>
+        </>
+      )}
+      <style>{`
+        .smooth-scroll {
+          scroll-behavior: smooth;
+        }
+        .scroll-reveal-custom {
+          width: 100%;
+          margin: 0;
+        }
+        .scroll-reveal-text-custom {
+          font-size: clamp(1rem, 3vw, 2.2rem);
+          line-height: 1.5;
+          margin: 0;
+          padding: 0;
+          word-break: break-word;
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+        body {
+          scroll-behavior: smooth;
+        }
+        * {
+          scroll-behavior: smooth;
+        }
+      `}</style>
     </div>
   );
 }
@@ -299,7 +395,7 @@ const styles = {
     height: '100vh',
     margin: 0,
     padding: 0,
-    position: 'fixed',
+    position: 'relative',
     top: 0,
     left: 0,
   },
@@ -325,7 +421,7 @@ const styles = {
     backgroundColor: '#FFD8DF',
     border: '2px solid #1E1E1E',
     borderRadius: '50px',
-    padding: '15px 30px',
+    padding: '10px 22px',
     fontSize: '1.25rem',
     fontWeight: '500',
     cursor: 'pointer',
@@ -336,7 +432,7 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     outline: 'none',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+    boxShadow: '0 2px 8px rgba(243, 115, 115, 0.07)',
     userSelect: 'none'
   },
   buttonTextWrapper: {

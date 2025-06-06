@@ -1,7 +1,7 @@
 /* Responsive grid for workspace */
 .workspaceGrid {
   display: grid;
-  grid-template-columns: 1.3fr 1.55fr 1.1fr;
+  grid-template-columns: 1.3fr 1.2fr 1.1fr;
   grid-template-rows: 0.25fr 0.7fr 0.8fr 1fr 1fr 1fr;
   column-gap: 20px;
   row-gap: 20px;
@@ -86,7 +86,7 @@
 /* Responsive styles for <900px */
 @media (max-width: 900px) {
   .workspaceGrid {
-    grid-template-columns: 1.3fr 1.7fr;
+    grid-template-columns: 1.3fr 1.2fr;
     /* Explicitly set grid-template-rows to match desktop for consistent row heights */
     grid-template-rows: 0.25fr 0.7fr 0.8fr 1fr 1fr 1fr;
     grid-template-areas:
