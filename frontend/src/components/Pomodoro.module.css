@@ -19,15 +19,15 @@
 
 .timerButton {
     border-radius: 20px;
-    border: 2px solid #1E1E1E;
+    border: 2px solid var(--color-border-dark);
     font-family: 'Gabarito', Arial, sans-serif;
     font-weight: 500;
-    color: #1E1E1E;
+    color: var(--color-text-main);
     transition: all 0.2s ease, padding 0.2s cubic-bezier(0.4,0,0.2,1);
     padding: 6px 15px;
     font-size: 14px;
     cursor: pointer;
-    background-color: #FFD8DF;
+    background-color: var(--color-accent);
     min-width: 60px;
     white-space: nowrap;
 }
@@ -41,8 +41,8 @@
 }
 
 .timerButton.active {
-    background-color: #1E1E1E;
-    color: #FEF9F1;
+    background-color: var(--color-border-dark);
+    color: var(--color-text-light);
 }
 
 .shortBreakBtn {
@@ -112,19 +112,19 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    border: 2px solid #1E1E1E;
+    border: 2px solid var(--color-border-dark);
     background-color: #747474;
     transition: all 0.3s ease;
 }
 
 .filled {
-    background-color: #FFD8DF;
+    background-color: var(--color-accent);
 }
 
 .progress.completed .filled {
-    background-color: #FF69B4;
-    border-color: #FF69B4;
-    box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+    background-color: var(--color-accent-strong);
+    border-color: var(--color-accent-strong);
+    box-shadow: var(--color-shadow-circle);
 }
 
 .timeRow {
@@ -140,7 +140,7 @@
     font-family: 'Gabarito', Arial, sans-serif;
     font-size: 3.5rem;
     font-weight: 700;
-    color: #1E1E1E;
+    color: var(--color-text-main);
     text-align: center;
     margin: 5px 0;
     flex-grow: 0;
@@ -161,8 +161,8 @@
 .startBtn {
     border-radius: 20px;
     padding: 8px 20px;
-    background-color: #1E1E1E;
-    color: #FEF9F1;
+    background-color: var(--color-border-dark);
+    color: var(--color-text-light);
     border: none;
     font-family: 'Gabarito', Arial, sans-serif;
     font-weight: 500;
@@ -190,7 +190,7 @@
 
 .iconBtn:hover {
     transform: scale(1.1);
-    background-color: rgba(30, 30, 30, 0.1);
+    background-color: var(--color-bg-btn-hover);
 }
 
 .editOverlay {
@@ -199,7 +199,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--color-bg-overlay);
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
@@ -209,10 +209,10 @@
 }
 
 .editModal {
-    background-color: #FEF9F1;
+    background-color: var(--color-bg-panel);
     padding: 20px;
     border-radius: 15px;
-    border: 2px solid #1E1E1E;
+    border: 2px solid var(--color-border-dark);
     width: 90%;
     max-width: 300px;
     animation: modalSlide 0.3s ease;
@@ -233,7 +233,7 @@
     font-family: 'Gabarito', Arial, sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #1E1E1E;
+    color: var(--color-text-main);
     margin: 0 0 15px 0;
     text-align: center;
 }
@@ -248,7 +248,7 @@
 .inputGroup label {
     font-family: 'Gabarito', Arial, sans-serif;
     font-weight: 500;
-    color: #1E1E1E;
+    color: var(--color-text-main);
     font-size: 14px;
     display: flex;
     flex-direction: column;
@@ -257,19 +257,19 @@
 
 .inputGroup input {
     border-radius: 10px;
-    border: 2px solid #1E1E1E;
+    border: 2px solid var(--color-border-dark);
     padding: 8px 12px;
     font-family: 'Gabarito', Arial, sans-serif;
     font-size: 14px;
-    background-color: #FFD8DF;
-    color: #1E1E1E;
+    background-color: var(--color-accent);
+    color: var(--color-text-main);
     transition: all 0.2s ease;
 }
 
 .inputGroup input:focus {
     outline: none;
-    background-color: #FEF9F1;
-    box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.1);
+    background-color: var(--color-bg-panel);
+    box-shadow: 0 0 0 2px var(--color-bg-btn-hover);
 }
 
 .modalButtons {
@@ -280,7 +280,7 @@
 
 .modalButtons button {
     border-radius: 15px;
-    border: 2px solid #1E1E1E;
+    border: 2px solid var(--color-border-dark);
     padding: 6px 15px;
     font-family: 'Gabarito', Arial, sans-serif;
     font-weight: 500;
@@ -290,13 +290,13 @@
 }
 
 .cancelBtn {
-    background-color: #747474;
-    color: #FEF9F1;
+    background-color: var(--color-btn-cancel);
+    color: var(--color-text-light);
 }
 
 .applyBtn {
-    background-color: #1E1E1E;
-    color: #FEF9F1;
+    background-color: var(--color-border-dark);
+    color: var(--color-text-light);
 }
 
 .modalButtons button:hover {

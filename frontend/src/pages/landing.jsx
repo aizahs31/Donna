@@ -254,7 +254,7 @@ export default function Landing() {
                     <motion.span
                       style={styles.buttonTextWrapper}
                       variants={{
-                        rest: { color: '#1E1E1E' },
+                        rest: { color: 'var(--color-text-main)' },
                         hover: { color: '#FEF9F1' }
                       }}
                       transition={{ duration: 0.25 }}
@@ -312,9 +312,6 @@ export default function Landing() {
         </>
       )}
       <style>{`
-        .smooth-scroll {
-          scroll-behavior: smooth;
-        }
         .scroll-reveal-custom {
           width: 100%;
           margin: 0;
@@ -325,15 +322,6 @@ export default function Landing() {
           margin: 0;
           padding: 0;
           word-break: break-word;
-        }
-        html {
-          scroll-behavior: smooth;
-        }
-        body {
-          scroll-behavior: smooth;
-        }
-        * {
-          scroll-behavior: smooth;
         }
       `}</style>
     </div>
@@ -348,13 +336,12 @@ const styles = {
     top: 0,
     left: 0,
     zIndex: 10,
-    pointerEvents: 'auto'
   },
   upperBranch: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: 'min(318px, 50vw, 50vh)',
+    width: 'min(400px, 50vw, 50vh)',
     maxWidth: '50vw',
     maxHeight: '50vh',
     height: 'auto',
@@ -364,7 +351,7 @@ const styles = {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 'min(318px, 50vw, 50vh)',
+    width: 'min(400px, 50vw, 50vh)',
     maxWidth: '50vw',
     maxHeight: '50vh',
     height: 'auto',
@@ -415,24 +402,24 @@ const styles = {
     fontFamily: '"Cedarville Cursive", cursive',
     fontSize: '2rem',
     marginTop: 0,
-    color: '#1E1E1E',
+    color: 'var(--color-text-main)',
   },
   connectButton: {
-    backgroundColor: '#FFD8DF',
-    border: '2px solid #1E1E1E',
+    backgroundColor: 'var(--color-accent)',
+    border: '2px solid var(--color-border-dark)',
     borderRadius: '50px',
     padding: '10px 22px',
     fontSize: '1.25rem',
     fontWeight: '500',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    color: '#1E1E1E',
+    color: 'var(--color-text-main)',
     position: 'relative',
     overflow: 'hidden',
     display: 'inline-flex',
     alignItems: 'center',
     outline: 'none',
-    boxShadow: '0 2px 8px rgba(243, 115, 115, 0.07)',
+    boxShadow: 'var(--color-shadow-accent)',
     userSelect: 'none'
   },
   buttonTextWrapper: {
@@ -455,7 +442,7 @@ const styles = {
     top: 0,
     width: '100%',
     height: '100%',
-    background: '#1E1E1E',
+    background: 'var(--color-text-main)',
     borderRadius: '50px',
     zIndex: 1,
     pointerEvents: 'none',

@@ -17,3 +17,59 @@ html {
   scrollbar-color: #CDCDCD transparent;
   scrollbar-width: thin;
 }
+
+.light-theme {
+  --color-bg-main: #E3EBFF;
+  --color-bg-panel: #FEF9F1;
+  --color-border: #CDCDCD;
+  --color-border-dark: #1E1E1E;
+  --color-accent: #FFD8DF;
+  --color-accent-dark: #D53169;
+  --color-accent-hover: #f9c7d3;
+  --color-accent-strong: #FF69B4;
+  --color-accent-muted: #f8c9d1;
+  --color-accent-input: #fddde5;
+  --color-accent-placeholder: #BC7986;
+  --color-btn-dark: #4C3838;
+  --color-btn-cancel: #747474;
+  --color-text-main: #1E1E1E;
+  --color-text-light: #FEF9F1;
+  --color-text-muted: #666;
+  --color-text-bot: #444;
+  --color-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.12);
+  --color-shadow-accent: 0 2px 8px rgba(243, 115, 115, 0.07);
+  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.18);
+  --color-shadow-circle: 0 0 8px rgba(255, 105, 180, 0.5);
+  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-btn-hover: rgba(30, 30, 30, 0.1);
+}
+
+.dark-theme{
+  --color-bg-main: #1E1E1E;
+  --color-bg-panel: #bebebe;
+  --color-border: #6b6b6b;
+  --color-border-dark: #1E1E1E;
+  --color-accent: #080505;
+  --color-accent-dark: #f6e0e7;
+  --color-accent-hover: #f9c7d3;
+  --color-accent-strong: #FF69B4;
+  --color-accent-muted: #f8c9d1;
+  --color-accent-input: #fddde5;
+  --color-accent-placeholder: #BC7986;
+  --color-btn-dark: #4C3838;
+  --color-btn-cancel: #747474;
+  --color-text-main: #1E1E1E;
+  --color-text-light: #FEF9F1;
+  --color-text-muted: #666;
+  --color-text-bot: #444;
+  --color-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.12);
+  --color-shadow-accent: 0 2px 8px rgba(243, 115, 115, 0.07);
+  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.18);
+  --color-shadow-circle: 0 0 8px rgba(255, 105, 180, 0.5);
+  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-btn-hover: rgba(30, 30, 30, 0.1);
+}

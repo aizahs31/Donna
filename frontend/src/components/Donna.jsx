@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const Donna = () => {
+const Donna = ({ calendarRef }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,11 @@ const Donna = () => {
       const data = await res.json();
       const botMessage = { from: "bot", text: data.reply };
       setMessages((prev) => [...prev, botMessage]);
+      
+      // If the response is "Done! The meeting has been scheduled", reload calendar events
+      if (data.reply === "Done! The meeting has been scheduled" && calendarRef?.current) {
+        calendarRef.current.reloadEvents();
+      }
     } catch (err) {
       console.error("Error sending message:", err);
       setMessages((prev) => [
@@ -40,8 +45,8 @@ const Donna = () => {
   }, [messages]);
 
   const containerStyle = {
-    backgroundColor: '#FEF9F1',
-    border: '2px solid #CDCDCD',
+    backgroundColor: 'var(--color-bg-panel)',
+    border: '2px solid var(--color-border)',
     padding: '1rem',
     borderRadius: '10px',
     height: '100%',
@@ -71,7 +76,7 @@ const Donna = () => {
 
   const userMsgStyle = {
     alignSelf: 'flex-end',
-    backgroundColor: '#f8c9d1',
+    backgroundColor: 'var(--color-accent-muted)',
     color: '#222',
     padding: '0.5rem 0.75rem',
     borderRadius: '1rem 1rem 0 1rem',
@@ -82,7 +87,7 @@ const Donna = () => {
 
   const botMsgStyle = {
     alignSelf: 'flex-start',
-    color: '#444',
+    color: 'var(--color-text-bot)',
     padding: '0.5rem 0.75rem',
     maxWidth: '75%',
     fontSize: '0.875rem',
@@ -107,7 +112,7 @@ const Donna = () => {
   const inputStyle = {
     width: '100%',
     padding: '0.75rem',
-    backgroundColor: '#fddde5',
+    backgroundColor: 'var(--color-accent-input)',
     borderRadius: '2rem',
     border: 'none',
     fontSize: '0.875rem',
@@ -117,11 +122,11 @@ const Donna = () => {
   };
 
   const placeholderStyle = {
-    color: '#BC7986',
+    color: 'var(--color-accent-placeholder)',
   };
 
   const sendButtonStyle = {
-    backgroundColor: '#4C3838',
+    backgroundColor: 'var(--color-btn-dark)',
     color: '#fff',
     border: 'none',
     padding: '7px 8.47px 2px 7px',
@@ -135,8 +140,8 @@ const Donna = () => {
   };
 
   const summarizeButtonStyle = {
-    backgroundColor: '#D53169',
-    color: '#FEF9F1',
+    backgroundColor: 'var(--color-accent-dark)',
+    color: 'var(--color-text-light)',
     border: 'none',
     padding: '8px 16px',
     borderRadius: '10px',
@@ -144,7 +149,7 @@ const Donna = () => {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,
-    alignSelf: 'flex-end', // aligns button to the right under the input
+    alignSelf: 'flex-end',
     marginTop: '0.25rem',
   };
 

@@ -4,11 +4,13 @@ import ShowSpotify from '../components/Spotify';
 import Task from '../components/Task';
 import DisplayTime from '../components/Time';
 import Calendar from '../components/Calendar';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styles from './workspace.module.css';
 
 const Workspace = () => {
   const [showDonna, setShowDonna] = useState(false);
+  const calendarRef = useRef(null);
+
   return (
     <div className={styles.workspaceGrid}>
       <div className={styles.timerArea}>
@@ -24,10 +26,10 @@ const Workspace = () => {
         <DisplayTime />
       </div>
       <div className={styles.calendarArea}>
-        <Calendar />
+        <Calendar ref={calendarRef} />
       </div>
       <div className={styles.donnaArea + ' ' + (showDonna ? styles.donnaVisible : '')}>
-        <Donna />
+        <Donna calendarRef={calendarRef} />
       </div>
       <button
         className={styles.donnaFab}

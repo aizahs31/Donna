@@ -1,10 +1,13 @@
 import { useState } from "react";
+import quotes from "../data/quotes";
 
 export default function ShowSpotify() {
     const [showPopup, setShowPopup] = useState(false);
     const [playlistUrl, setPlaylistUrl] = useState("");
     const [embedUrl, setEmbedUrl] = useState("https://open.spotify.com/embed/playlist/37i9dQZF1DWWQRwui0ExPn?utm_source=generator");
     const [tempUrl, setTempUrl] = useState("");
+    const [showPlayer, setShowPlayer] = useState(false);
+    const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
 
     const getEmbedUrl = (url) => {
         const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
@@ -25,60 +28,145 @@ export default function ShowSpotify() {
         setShowPopup(false);
     };
 
+    const SpotifyButton = ({ onClick, children }) => (
+        <button
+            onClick={onClick}
+            style={{
+                background: '#FFD8DF',
+                color: '#1E1E1E',
+                border: '2px solid #1E1E1E',
+                height: '48px',
+                borderRadius: '10px',
+                padding: '0 16px',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                whiteSpace: 'normal',
+                textAlign: 'center',
+                lineHeight: '1.2',
+                width: '100%',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                position: 'relative',
+                overflow: 'hidden',
+            }}
+            className="spotify-playlist-btn"
+        >
+            <span>{children}</span>
+        </button>
+    );
+
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <iframe
-                style={{ borderRadius: '12px', width: '350px', height: '152px', maxWidth: 600, border: 'none' }}
-                src={embedUrl}
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                allowFullScreen=""
-            ></iframe>
-            <button
-                style={{
-                    background: 'transparent',
-                    color: '#1E1E1E',
-                    border: 'none',
-                    height: '100%',
-                    borderRadius: 10,
-                    fontWeight: 600,
-                    fontSize: '1.1rem',
-                    cursor: 'pointer',
+        <div style={{
+            width: '100%',
+            height: '152px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative'
+        }}>
+            {!showPlayer ? (
+                // Quote Display with Play Music Button on the left
+                <div style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 'calc(100% - 370px)', // 350px iframe + 20px gap
-                    minWidth: 120,
-                    maxWidth: 200,
-                }}
-                className="spotify-playlist-btn"
-                onClick={() => { setTempUrl(playlistUrl); setShowPopup(true); }}
-            >
-                <span className="spotify-playlist-btn-text">Play your playlist</span>
-                <span style={{ marginTop: 6, fontSize: 24, color: '#1DB954' }}>
-                    <svg width="35" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 12H38M38 12L24 2M38 12L24 22" stroke="#1E1E1E" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                </span>
-            </button>
-            <style>{`
-                .spotify-playlist-btn-text {
-                    transition: text-shadow 0.2s;
-                }
-                .spotify-playlist-btn:hover .spotify-playlist-btn-text {
-                    text-shadow: 0 2px 8px rgb(142, 142, 142);
-                }
-                .spotify-playlist-btn:hover {
-                    transform: scale(1.03);
-                    transition: transform 0.2s ease-in-out;
-                }
-                @media (max-width: 900px) {
-                    .spotify-playlist-btn {
-                        display: none !important;
-                    }
-                }
-            `}</style>
+                    gap: '32px',
+                    width: '100%',
+                    padding: '0 40px',
+                    height: '100%'
+                }}>
+                    {/* Play Music Button */}
+                    <div style={{
+                        width: '80px',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%',
+                    }}>
+                        <SpotifyButton onClick={() => setShowPlayer(true)}>
+                            Play music
+                        </SpotifyButton>
+                    </div>
+
+                    {/* Quote Display */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        textAlign: 'center',
+                        flex: 1,
+                        maxWidth: '600px'
+                    }}>
+                        <p style={{
+                            margin: 0,
+                            fontSize: '1.5rem',
+                            fontFamily: "'Playfair Display', serif",
+                            color: 'var(--color-text-main)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.4
+                        }}>
+                            "{currentQuote.text}"
+                        </p>
+                        <p style={{
+                            margin: 0,
+                            fontSize: '1rem',
+                            color: 'var(--color-text-secondary)',
+                            fontFamily: "'Playfair Display', serif"
+                        }}>
+                            — {currentQuote.author}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                // Spotify Player
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    gap: '20px',
+                    width: '100%',
+                    height: '100%'
+                }}>
+                    {/* Buttons Column */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        width: '80px',
+                        flexShrink: 0,
+                        justifyContent: 'center',
+                        height: '100%',
+                    }}>
+                        <SpotifyButton onClick={() => { setTempUrl(playlistUrl); setShowPopup(true); }}>
+                            Change playlist
+                        </SpotifyButton>
+                        <SpotifyButton onClick={() => setShowPlayer(false)}>
+                            Close playlist
+                        </SpotifyButton>
+                    </div>
+
+                    {/* Spotify Embed */}
+                    <iframe
+                        style={{
+                            borderRadius: '12px',
+                            width: '100%',
+                            height: '152px',
+                            border: 'none'
+                        }}
+                        src={embedUrl}
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        allowFullScreen=""
+                    ></iframe>
+                </div>
+            )}
+
+            {/* Popup */}
             {showPopup && (
                 <div style={{
                     position: 'fixed',
@@ -128,28 +216,36 @@ export default function ShowSpotify() {
                             <button
                                 onClick={handleCancel}
                                 style={{
-                                    background: '#747474',
+                                    background: 'linear-gradient(135deg, #747474 0%, #5a5a5a 100%)',
                                     color: '#FEF9F1',
                                     borderRadius: '30px',
                                     border: '2px solid #1E1E1E',
-                                    padding: '8px 18px',
+                                    padding: '10px 20px',
                                     fontWeight: 500,
                                     fontSize: '1rem',
                                     cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                                 }}
                             >Cancel</button>
                             <button
                                 onClick={handleApply}
                                 style={{
-                                    background: '#1E1E1E',
+                                    background: tempUrl && getEmbedUrl(tempUrl)
+                                        ? 'linear-gradient(135deg, #1E1E1E 0%, #000 100%)'
+                                        : '#ccc',
                                     color: '#FEF9F1',
                                     border: 'none',
                                     borderRadius: '30px',
-                                    padding: '8px 18px',
+                                    padding: '10px 20px',
                                     fontWeight: 500,
                                     fontSize: '1rem',
                                     cursor: tempUrl && getEmbedUrl(tempUrl) ? 'pointer' : 'not-allowed',
                                     opacity: tempUrl && getEmbedUrl(tempUrl) ? 1 : 0.4,
+                                    transition: 'all 0.3s ease',
+                                    boxShadow: tempUrl && getEmbedUrl(tempUrl)
+                                        ? '0 2px 8px rgba(0,0,0,0.2)'
+                                        : 'none'
                                 }}
                                 disabled={!tempUrl || !getEmbedUrl(tempUrl)}
                             >Apply</button>
@@ -157,6 +253,30 @@ export default function ShowSpotify() {
                     </div>
                 </div>
             )}
+
+            <style>{`
+                .spotify-playlist-btn:hover {
+                    background: #1E1E1E !important;
+                    color: #FEF9F1 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                }
+                .spotify-playlist-btn:active {
+                    transform: translateY(0px);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+                .spotify-playlist-btn span {
+                    transition: color 0.3s ease;
+                }
+                .spotify-playlist-btn:hover span {
+                    color: #FEF9F1 !important;
+                }
+                @media (max-width: 900px) {
+                    .spotify-playlist-btn {
+                        display: none !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
