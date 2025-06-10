@@ -13,6 +13,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 html {
   scrollbar-color: #CDCDCD transparent;
   scrollbar-width: thin;
@@ -46,30 +54,58 @@ html {
   --color-bg-btn-hover: rgba(30, 30, 30, 0.1);
 }
 
-.dark-theme{
-  --color-bg-main: #1E1E1E;
-  --color-bg-panel: #bebebe;
-  --color-border: #6b6b6b;
-  --color-border-dark: #1E1E1E;
-  --color-accent: #080505;
-  --color-accent-dark: #f6e0e7;
-  --color-accent-hover: #f9c7d3;
-  --color-accent-strong: #FF69B4;
-  --color-accent-muted: #f8c9d1;
-  --color-accent-input: #fddde5;
-  --color-accent-placeholder: #BC7986;
-  --color-btn-dark: #4C3838;
-  --color-btn-cancel: #747474;
-  --color-text-main: #1E1E1E;
-  --color-text-light: #FEF9F1;
-  --color-text-muted: #666;
-  --color-text-bot: #444;
-  --color-shadow: 0 4px 24px rgba(0,0,0,0.18);
-  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.12);
-  --color-shadow-accent: 0 2px 8px rgba(243, 115, 115, 0.07);
-  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.18);
-  --color-shadow-circle: 0 0 8px rgba(255, 105, 180, 0.5);
-  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --color-bg-overlay: rgba(0, 0, 0, 0.5);
-  --color-bg-btn-hover: rgba(30, 30, 30, 0.1);
+.dark-theme {
+  --color-bg-main: #0d0d12;
+  --color-bg-panel: #171a27;
+  --color-border: #414868;
+  --color-border-dark: #A9B1D6;
+  --color-accent: #3a2d54;
+  --color-accent-dark: #9D7CD8;
+  --color-accent-hover: #020307;
+  --color-accent-strong: #b62e47;
+  --color-accent-muted: #a5acc4;
+  --color-accent-input: #414868;
+  --color-accent-placeholder: #787C99;
+  --color-btn-dark: #5b5f72;
+  --color-btn-cancel: #676b7e;
+  --color-text-main: #C0CAF5;
+  --color-text-light: #0d0d12;
+  --color-text-muted: #787C99;
+  --color-text-bot: #9AA5CE;
+  --color-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.2);
+  --color-shadow-accent: 0 2px 8px rgba(187, 154, 247, 0.1);
+  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.25);
+  --color-shadow-circle: 0 0 8px rgba(187, 154, 247, 0.5);
+  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --color-bg-overlay: rgba(0, 0, 0, 0.7);
+  --color-bg-btn-hover: rgba(169, 177, 214, 0.1);
 }
+
+/* .dark-theme {
+  --color-bg-main: #1A1B26;
+  --color-bg-panel: #24283B;
+  --color-border: #414868;
+  --color-border-dark: #A9B1D6;
+  --color-accent: #BB9AF7;
+  --color-accent-dark: #9D7CD8;
+  --color-accent-hover: #7AA2F7;
+  --color-accent-strong: #F7768E;
+  --color-accent-muted: #9AA5CE;
+  --color-accent-input: #414868;
+  --color-accent-placeholder: #787C99;
+  --color-btn-dark: #565F89;
+  --color-btn-cancel: #787C99;
+  --color-text-main: #C0CAF5;
+  --color-text-light: #A9B1D6;
+  --color-text-muted: #787C99;
+  --color-text-bot: #9AA5CE;
+  --color-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.2);
+  --color-shadow-accent: 0 2px 8px rgba(187, 154, 247, 0.1);
+  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.25);
+  --color-shadow-circle: 0 0 8px rgba(187, 154, 247, 0.5);
+  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --color-bg-overlay: rgba(0, 0, 0, 0.7);
+  --color-bg-btn-hover: rgba(169, 177, 214, 0.1);
+} */

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import ScrollReveal from '../components/ScrollReveal';
+// import Footer from "../components/Footer"
 
 
 export default function Landing() {
@@ -40,7 +41,7 @@ export default function Landing() {
         {
           id: flowerId.current++,
           left: Math.random() * 92 + 2, // 2vw to 94vw
-          size: Math.random() * 32 + 32, // 32px to 64px
+          size: Math.random() * 12 + 42,
           duration: Math.random() * 2 + 4, // 4s to 6s
           delay: Math.random() * 2, // 0-2s
           rotate: Math.random() > 0.5 ? 1 : -1,
@@ -59,23 +60,23 @@ export default function Landing() {
   }, [flowers, showAfterLoad]);
 
   // Add controlled scroll behavior
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+  // useEffect(() => {
+  //   const container = containerRef.current;
+  //   if (!container) return;
 
-    const handleWheel = (e) => {
-      e.preventDefault();
-      const scrollAmount = 350;
-      const direction = Math.sign(e.deltaY);
-      container.scrollBy({
-        top: direction * scrollAmount,
-        behavior: 'smooth'
-      });
-    };
+  //   const handleWheel = (e) => {
+  //     e.preventDefault();
+  //     const scrollAmount = 1000;
+  //     const direction = Math.sign(e.deltaY);
+  //     container.scrollBy({
+  //       top: direction * scrollAmount,
+  //       behavior: 'smooth'
+  //     });
+  //   };
 
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
-  }, []);
+  //   container.addEventListener('wheel', handleWheel, { passive: false });
+  //   return () => container.removeEventListener('wheel', handleWheel);
+  // }, []);
 
   return (
     <div
@@ -130,19 +131,19 @@ export default function Landing() {
           <>
             {/* Upper branch background - now fixed at the top */}
             <motion.img
-              src="images/upper.png"
+              src="images/right.png"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, ease: [0.77, 0, 0.18, 1] }}
               style={{
                 position: "fixed",
                 top: 0,
-                left: 0,
-                width: "500px",
-                maxWidth: "50vw",
-                maxHeight: "50vh",
-                height: "auto",
-                zIndex: 10,
+                right: -90,
+                width: 'min(1000px, 80vw)',
+                maxWidth: '60vw',
+                maxHeight: '60vh',
+                height: 'auto',
+                zIndex: 1,
                 pointerEvents: "none",
                 userSelect: "none"
               }}
@@ -324,6 +325,7 @@ export default function Landing() {
           word-break: break-word;
         }
       `}</style>
+      {/* <Footer /> */}
     </div>
   );
 }

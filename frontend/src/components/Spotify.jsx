@@ -4,14 +4,14 @@ import quotes from "../data/quotes";
 export default function ShowSpotify() {
     const [showPopup, setShowPopup] = useState(false);
     const [playlistUrl, setPlaylistUrl] = useState("");
-    const [embedUrl, setEmbedUrl] = useState("https://open.spotify.com/embed/playlist/37i9dQZF1DWWQRwui0ExPn?utm_source=generator");
+    const [embedUrl, setEmbedUrl] = useState("https://open.spotify.com/embed/playlist/37i9dQZF1DWWQRwui0ExPn?utm_source=generator&theme=0");
     const [tempUrl, setTempUrl] = useState("");
     const [showPlayer, setShowPlayer] = useState(false);
     const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
 
     const getEmbedUrl = (url) => {
         const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
-        return match ? `https://open.spotify.com/embed/playlist/${match[1]}` : "";
+        return match ? `https://open.spotify.com/embed/playlist/${match[1]}?utm_source=generator&theme=0` : "";
     };
 
     const handleApply = () => {
@@ -32,9 +32,9 @@ export default function ShowSpotify() {
         <button
             onClick={onClick}
             style={{
-                background: '#FFD8DF',
-                color: '#1E1E1E',
-                border: '2px solid #1E1E1E',
+                background: 'var(--color-accent)',
+                color: 'var(--color-text-light)',
+                border: '2px var(--color-border-dark) solid',
                 height: '48px',
                 borderRadius: '10px',
                 padding: '0 16px',
@@ -51,7 +51,7 @@ export default function ShowSpotify() {
                 width: '100%',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                 position: 'relative',
-                overflow: 'hidden',
+                // overflow: 'hidden',
             }}
             className="spotify-playlist-btn"
         >
@@ -130,7 +130,8 @@ export default function ShowSpotify() {
                     alignItems: 'flex-start',
                     gap: '20px',
                     width: '100%',
-                    height: '100%'
+                    height: '100%',
+                    // backgroundColor: 'var(--color-bg-overlay)',
                 }}>
                     {/* Buttons Column */}
                     <div style={{
@@ -156,7 +157,8 @@ export default function ShowSpotify() {
                             borderRadius: '12px',
                             width: '100%',
                             height: '152px',
-                            border: 'none'
+                            border: 'none',
+                            backgroundColor: 'var(--color-bg-overlay)',
                         }}
                         src={embedUrl}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -182,19 +184,19 @@ export default function ShowSpotify() {
                     justifyContent: 'center',
                 }}>
                     <div style={{
-                        background: '#FEF9F1',
+                        backgroundColor: 'var(--color-bg-panel)',
                         borderRadius: '15px',
-                        border: '2px solid #1E1E1E',
+                        border: '2px solid var(--color-border-dark)',
+                        maxWidth: '300px',
+                        animation: 'modalSlide 0.3s ease',
                         padding: '32px 24px',
                         minWidth: 320,
-                        maxWidth: 350,
-                        width: '90%',
                         boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                     }}>
-                        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 600, fontSize: '1.1rem', color: '#1E1E1E' }}>Paste your Spotify playlist link</h3>
+                        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 600, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>Paste your Spotify playlist link</h3>
                         <input
                             type="text"
                             value={tempUrl}
@@ -205,21 +207,21 @@ export default function ShowSpotify() {
                                 padding: '10px',
                                 fontSize: '1rem',
                                 borderRadius: 10,
-                                border: '2px solid #1E1E1E',
+                                border: '2px solid var(--color-border-dark)',
                                 marginBottom: 18,
                                 outline: 'none',
-                                background: '#FFD8DF',
-                                color: '#222',
+                                backgroundColor: 'var(--color-accent-input)',
+                                color: 'var(--color-text-muted)',
                             }}
                         />
                         <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'center' }}>
                             <button
                                 onClick={handleCancel}
                                 style={{
-                                    background: 'linear-gradient(135deg, #747474 0%, #5a5a5a 100%)',
-                                    color: '#FEF9F1',
+                                    background: 'var(--color-bg-panel)',
+                                    color: 'var(--color-text-dark)',
                                     borderRadius: '30px',
-                                    border: '2px solid #1E1E1E',
+                                    border: '2px solid var(--color-border-dark)',
                                     padding: '10px 20px',
                                     fontWeight: 500,
                                     fontSize: '1rem',
@@ -232,9 +234,9 @@ export default function ShowSpotify() {
                                 onClick={handleApply}
                                 style={{
                                     background: tempUrl && getEmbedUrl(tempUrl)
-                                        ? 'linear-gradient(135deg, #1E1E1E 0%, #000 100%)'
+                                        ? 'var(--color-border-dark)'
                                         : '#ccc',
-                                    color: '#FEF9F1',
+                                    color: 'var(--color-text-light)',
                                     border: 'none',
                                     borderRadius: '30px',
                                     padding: '10px 20px',

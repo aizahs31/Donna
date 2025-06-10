@@ -51,16 +51,17 @@ const TaskList = () => {
     wrapper: {
       marginTop: 0,
       paddingTop: 0,
-      position: 'relative', // Make wrapper relative for absolute positioning
-      minHeight: '250px', // Ensure enough height for button placement
+      position: 'relative',
+      minHeight: '250px',
     },
     title: {
       fontWeight: '600',
       fontSize: '1.125rem',
-      marginBottom: '0.5rem',
-      paddingBottom: '0.25rem',
-      borderBottom: '1px solid #ccc',
+      marginTop: 0,
+      padding: '0 0 8px',
+      borderBottom: '1px solid var(--color-border)',
       width: '100%',
+      lineHeight: '1',
     },
     list: {
       listStyle: 'none',
@@ -100,7 +101,7 @@ const TaskList = () => {
       minHeight: '1rem',
       maxWidth: '1rem',
       maxHeight: '1rem',
-      border: '2px solid #1E1E1E',
+      border: '2px solid var(--color-border-dark)',
       borderRadius: '2px',
       display: 'inline-block',
       position: 'relative',
@@ -108,7 +109,7 @@ const TaskList = () => {
       boxSizing: 'border-box',
     },
     checkboxChecked: {
-      backgroundColor: '#1E1E1E',
+      backgroundColor: 'var(--color-border-dark)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -116,7 +117,7 @@ const TaskList = () => {
     checkmarkSvg: {
       width: '15px',
       height:'15px',
-      stroke: '#fff',
+      stroke: 'var(--color-text-light)',
       strokeWidth: 3,
       fill: 'none',
     },

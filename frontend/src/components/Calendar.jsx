@@ -38,7 +38,7 @@ const Calendar = forwardRef((props, ref) => {
 
   // Set up polling for events
   useEffect(() => {
-    const pollInterval = setInterval(fetchEvents, 30000); // Poll every 30 seconds
+    const pollInterval = setInterval(fetchEvents, 3000)
     return () => clearInterval(pollInterval);
   }, []);
 

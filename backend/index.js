@@ -33,11 +33,11 @@ When processing calendar-related requests:
 {
   "type": "calendar_event",
   "event": {
-    "summary": "Event title",
-    "start": "Local date time string (e.g., 2024-03-20T14:00:00)",
-    "end": "Local date time string (e.g., 2024-03-20T15:00:00)",
-    "description": "Optional event description",
-    "timeZone": "User's time zone (from context)"
+    "summary": "",
+    "start": "",
+    "end": "",
+    "description": "",
+    "timeZone": ""
   }
 }
 
