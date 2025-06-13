@@ -67,7 +67,7 @@ export default function ShowSpotify() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            position: 'relative'
+            position: 'relative',
         }}>
             {!showPlayer ? (
                 // Quote Display with Play Music Button on the left
@@ -154,7 +154,7 @@ export default function ShowSpotify() {
                     {/* Spotify Embed */}
                     <iframe
                         style={{
-                            borderRadius: '12px',
+                            borderRadius: '14px',
                             width: '100%',
                             height: '152px',
                             border: 'none',
