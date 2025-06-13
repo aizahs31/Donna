@@ -23,6 +23,19 @@ const TaskList = () => {
     }
   }, [isAdding]);
 
+  // Listen for task updates from Donna
+  useEffect(() => {
+    const handleTasksUpdated = () => {
+      const saved = localStorage.getItem('tasks');
+      if (saved) {
+        setTasks(JSON.parse(saved));
+      }
+    };
+
+    window.addEventListener('tasksUpdated', handleTasksUpdated);
+    return () => window.removeEventListener('tasksUpdated', handleTasksUpdated);
+  }, []);
+
   const addTask = () => {
     setIsAdding(true);
     setTasks([...tasks, { text: '', completed: false }]);
@@ -198,9 +211,8 @@ const TaskList = () => {
             }}
             onClick={e => {
               e.stopPropagation();
-              if (!isAdding) {
+              if (!isAdding && !task.completed) {
                 setIsAdding(true);
-                // If not already editing, set to edit this task
                 setTasks(tasks => tasks.map((t, i) => i === index ? { ...t, editing: true } : { ...t, editing: false }));
               }
             }}
@@ -229,9 +241,7 @@ const TaskList = () => {
                 </svg>
               )}
             </div>
-            {task.completed ? (
-              <span style={styles.text(task.completed)}>{task.text}</span>
-            ) : (task.editing || (isAdding && index === tasks.length - 1 && task.text === '')) ? (
+            {(!task.completed && (task.editing || (isAdding && index === tasks.length - 1 && task.text === ''))) ? (
               <input
                 ref={inputRef}
                 style={styles.input}
@@ -246,7 +256,6 @@ const TaskList = () => {
             ) : (
               <span style={styles.text(task.completed)}>{task.text}</span>
             )}
-
             {/* Delete button at the right end, only visible on hover */}
             <button
               type="button"

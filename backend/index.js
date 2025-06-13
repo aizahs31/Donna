@@ -14,7 +14,7 @@ const port =  3000;
 // Fix CORS to match Vite frontend port
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  methods: ["POST", "GET"],
+  methods: ["POST", "GET", "DELETE"],
   credentials: true,
 }));
 
@@ -23,37 +23,61 @@ app.use(bodyParser.json());
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-// Enhanced system prompt with calendar capabilities
-const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Ryze. Always refer to yourself as Donna and answer in a warm, concise, and helpful manner, and witty at times. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar, so you can help with scheduling and reminders.
+// Enhanced system prompt with calendar and task capabilities
+const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Ryze. Always refer to yourself as Donna and answer in a warm, concise, and helpful manner, and witty at times. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar and task management system, so you can help with scheduling, reminders, and task organization.
 
-When processing calendar-related requests:
-1. If the user wants to create/schedule an event, ONLY respond with a valid JSON object, nothing else.
-2. Use the current date and time (provided in the user's message) as context for relative times like "tomorrow", "next week", etc.
-3. For calendar event requests, the response must be EXACTLY in this format with no additional text:
+When processing requests, you can handle:
+
+1. CALENDAR EVENTS - For creating/scheduling events, respond with ONLY this JSON format:
 {
   "type": "calendar_event",
   "event": {
-    "summary": "",
-    "start": "",
-    "end": "",
-    "description": "",
-    "timeZone": ""
+    "summary": "Event title",
+    "start": "Local date time string (e.g., 2024-03-20T14:00:00)",
+    "end": "Local date time string (e.g., 2024-03-20T15:00:00)",
+    "description": "Optional event description",
+    "timeZone": "User's time zone (from context)"
   }
 }
 
-Example calendar event JSON (no other text):
+2. DELETE CALENDAR EVENTS - For deleting events, respond with ONLY this JSON format:
 {
-  "type": "calendar_event",
-  "event": {
-    "summary": "Team Meeting",
-    "start": "2024-03-20T14:00:00",
-    "end": "2024-03-20T15:00:00",
-    "description": "Weekly team sync",
-    "timeZone": "Asia/Kolkata"
+  "type": "delete_calendar_event",
+  "query": "search terms to find the event to delete"
+}
+
+3. TASK MANAGEMENT - For task operations, respond with ONLY this JSON format:
+
+For adding tasks:
+{
+  "type": "add_task",
+  "task": {
+    "text": "Task description",
+    "completed": false
   }
 }
 
-For non-calendar requests, respond normally as a helpful assistant.
+For updating tasks:
+{
+  "type": "update_task",
+  "task": {
+    "query": "search terms to find the task",
+    "updates": {
+      "text": "new task description (optional)",
+      "completed": true/false (optional)
+    }
+  }
+}
+
+For deleting tasks:
+{
+  "type": "delete_task",
+  "query": "search terms to find the task to delete"
+}
+
+Use the current date and time (provided in the user's message) as context for relative times like "tomorrow", "next week", etc.
+
+For non-calendar/task requests, respond normally as a helpful assistant.
 Always respond in a way that feels like a conversation with a friend.`;
 
 app.post("/chat", async (req, res) => {
@@ -92,8 +116,8 @@ app.post("/chat", async (req, res) => {
         // Found JSON in code block
         jsonResponse = JSON.parse(codeBlockMatch[1]);
         console.log("Extracted JSON from code block:", jsonResponse);
-      } else if (replyText.includes('"type":"calendar_event"')) {
-        // Try direct JSON parsing if no code block but contains calendar event signature
+      } else if (replyText.includes('"type":')) {
+        // Try direct JSON parsing if no code block but contains type signature
         const jsonMatch = replyText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           jsonResponse = JSON.parse(jsonMatch[0]);
@@ -108,50 +132,132 @@ app.post("/chat", async (req, res) => {
       return;
     }
 
-    // If we got here and have valid JSON for a calendar event
-    if (jsonResponse && jsonResponse.type === "calendar_event") {
-      try {
-        console.log("Creating calendar event with data:", jsonResponse.event);
-        // Create calendar event
-        const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-        
-        // Ensure we have valid start and end times
-        if (!jsonResponse.event.start || !jsonResponse.event.end) {
-          throw new Error("Missing start or end time");
-        }
+    // Handle different types of JSON responses
+    if (jsonResponse) {
+      switch (jsonResponse.type) {
+        case "calendar_event":
+          try {
+            console.log("Creating calendar event with data:", jsonResponse.event);
+            const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+            
+            if (!jsonResponse.event.start || !jsonResponse.event.end) {
+              throw new Error("Missing start or end time");
+            }
 
-        const event = {
-          summary: jsonResponse.event.summary,
-          start: { 
-            dateTime: jsonResponse.event.start,
-            timeZone: jsonResponse.event.timeZone || timeZone
-          },
-          end: { 
-            dateTime: jsonResponse.event.end,
-            timeZone: jsonResponse.event.timeZone || timeZone
-          },
-          description: jsonResponse.event.description,
-          reminders: {
-            useDefault: false,
-            overrides: [{ method: 'popup', minutes: 10 }],
-          },
-        };
-        
-        const calendarResponse = await calendar.events.insert({
-          calendarId: 'primary',
-          resource: event,
-        });
-        
-        console.log("Calendar event created:", calendarResponse.data);
-        // Send success message
-        res.json({ reply: "Done! The meeting has been scheduled." });
-      } catch (calendarError) {
-        console.error("Failed to create calendar event:", calendarError);
-        res.json({ reply: "Sorry, I couldn't schedule the event. Please try again." });
+            const event = {
+              summary: jsonResponse.event.summary,
+              start: { 
+                dateTime: jsonResponse.event.start,
+                timeZone: jsonResponse.event.timeZone || timeZone
+              },
+              end: { 
+                dateTime: jsonResponse.event.end,
+                timeZone: jsonResponse.event.timeZone || timeZone
+              },
+              description: jsonResponse.event.description,
+              reminders: {
+                useDefault: false,
+                overrides: [{ method: 'popup', minutes: 10 }],
+              },
+            };
+            
+            const calendarResponse = await calendar.events.insert({
+              calendarId: 'primary',
+              resource: event,
+            });
+            
+            console.log("Calendar event created:", calendarResponse.data);
+            res.json({ reply: "Done! The meeting has been scheduled.", action: "calendar_created" });
+          } catch (calendarError) {
+            console.error("Failed to create calendar event:", calendarError);
+            res.json({ reply: "Sorry, I couldn't schedule the event. Please try again." });
+          }
+          break;
+
+        case "delete_calendar_event":
+          try {
+            console.log("Deleting calendar event with query:", jsonResponse.query);
+            const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+            
+            // Search for events matching the query
+            const searchResponse = await calendar.events.list({
+              calendarId: 'primary',
+              q: jsonResponse.query,
+              timeMin: new Date().toISOString(),
+              maxResults: 10,
+              singleEvents: true,
+              orderBy: 'startTime',
+            });
+
+            const events = searchResponse.data.items;
+            if (events && events.length > 0) {
+              // Delete the first matching event
+              await calendar.events.delete({
+                calendarId: 'primary',
+                eventId: events[0].id,
+              });
+              
+              console.log("Calendar event deleted:", events[0].summary);
+              res.json({ reply: `Done! I've deleted the event "${events[0].summary}".`, action: "calendar_deleted" });
+            } else {
+              res.json({ reply: "I couldn't find any matching events to delete." });
+            }
+          } catch (calendarError) {
+            console.error("Failed to delete calendar event:", calendarError);
+            res.json({ reply: "Sorry, I couldn't delete the event. Please try again." });
+          }
+          break;
+
+        case "add_task":
+          try {
+            console.log("Adding task:", jsonResponse.task);
+            res.json({ 
+              reply: `Done! I've added "${jsonResponse.task.text}" to your tasks.`, 
+              action: "task_added",
+              taskData: jsonResponse.task
+            });
+          } catch (taskError) {
+            console.error("Failed to add task:", taskError);
+            res.json({ reply: "Sorry, I couldn't add the task. Please try again." });
+          }
+          break;
+
+        case "update_task":
+          try {
+            console.log("Updating task:", jsonResponse.task);
+            res.json({ 
+              reply: `Done! I've updated your task.`, 
+              action: "task_updated",
+              taskData: jsonResponse.task
+            });
+          } catch (taskError) {
+            console.error("Failed to update task:", taskError);
+            res.json({ reply: "Sorry, I couldn't update the task. Please try again." });
+          }
+          break;
+
+        case "delete_task":
+          try {
+            console.log("Deleting task with query:", jsonResponse.query);
+            res.json({ 
+              reply: `Done! I've deleted the task.`, 
+              action: "task_deleted",
+              query: jsonResponse.query
+            });
+          } catch (taskError) {
+            console.error("Failed to delete task:", taskError);
+            res.json({ reply: "Sorry, I couldn't delete the task. Please try again." });
+          }
+          break;
+
+        default:
+          console.log("Unknown JSON response type:", jsonResponse.type);
+          const reply = marked.parse(replyText);
+          res.json({ reply });
       }
     } else {
-      // Not a calendar event response
-      console.log("Not a calendar event, sending normal response");
+      // Not a structured response
+      console.log("Not a structured response, sending normal response");
       const reply = marked.parse(replyText);
       res.json({ reply });
     }
@@ -255,6 +361,24 @@ app.post('/events', async (req, res) => {
   } catch (err) {
     console.error('Error creating event:', err);
     res.status(500).json({ error: 'Failed to create event' });
+  }
+});
+
+// Delete calendar event
+app.delete('/events/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    
+    await calendar.events.delete({
+      calendarId: 'primary',
+      eventId: eventId,
+    });
+    
+    res.json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ error: 'Failed to delete event' });
   }
 });
 
