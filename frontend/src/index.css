@@ -100,13 +100,13 @@ html {
   --color-accent-strong: #b62e47;
   --color-accent-muted: #cdcdcd;
   --color-accent-input: #303030;
-  --color-accent-placeholder: #787C99;
+  --color-accent-placeholder: #c9c9c9;
   --color-btn-dark: #515151;
   --color-btn-cancel: #676b7e;
   --color-text-main: #efefef;
   --color-text-light: #ffffff;
   --color-text-muted: #A6A6A6;
-  --color-text-bot: #252d48;
+  --color-text-bot: #FFFFFF;
   --color-shadow: 0 4px 24px rgba(0,0,0,0.25);
   --color-shadow-light: 0 2px 8px rgba(0,0,0,0.2);
   --color-shadow-accent: 0 2px 8px rgba(187, 154, 247, 0.1);
@@ -119,24 +119,22 @@ html {
 
 .night-theme {
   --color-bg-main: #0d0d12;
-  --color-bg-main-rgb: 13, 13, 18;
-  --color-bg-panel: #171a27;
-  --color-bg-panel-rgb: 23, 26, 39;
+  --color-bg-panel: #11141d;
   --color-border: #414868;
-  --color-border-dark: #A9B1D6;
-  --color-accent: #3a2d54;
-  --color-accent-dark: #9D7CD8;
+  --color-border-dark: #c6c0e3;
+  --color-accent: #3d214c;
+  --color-accent-dark: #6f5896;
   --color-accent-hover: #020307;
-  --color-accent-strong: #b62e47;
-  --color-accent-muted: #a5acc4;
-  --color-accent-input: #414868;
-  --color-accent-placeholder: #787C99;
+  --color-accent-strong: #0d0d12;
+  --color-accent-muted: #d6c1ef;
+  --color-accent-input: #4b4168;
+  --color-accent-placeholder: #e8e1f8;
   --color-btn-dark: #5b5f72;
   --color-btn-cancel: #676b7e;
-  --color-text-main: #C0CAF5;
+  --color-text-main: #eeecf4;
   --color-text-light: #0d0d12;
-  --color-text-muted: #787C99;
-  --color-text-bot: #9AA5CE;
+  --color-text-muted: #ffffff;
+  --color-text-bot: #ecebf4;
   --color-shadow: 0 4px 24px rgba(0,0,0,0.25);
   --color-shadow-light: 0 2px 8px rgba(0,0,0,0.2);
   --color-shadow-accent: 0 2px 8px rgba(187, 154, 247, 0.1);
@@ -146,31 +144,3 @@ html {
   --color-bg-overlay: rgba(0, 0, 0, 0.7);
   --color-bg-btn-hover: rgba(169, 177, 214, 0.1);
 }
-
-/* .dark-theme {
-  --color-bg-main: #1A1B26;
-  --color-bg-panel: #24283B;
-  --color-border: #414868;
-  --color-border-dark: #A9B1D6;
-  --color-accent: #BB9AF7;
-  --color-accent-dark: #9D7CD8;
-  --color-accent-hover: #7AA2F7;
-  --color-accent-strong: #F7768E;
-  --color-accent-muted: #9AA5CE;
-  --color-accent-input: #414868;
-  --color-accent-placeholder: #787C99;
-  --color-btn-dark: #565F89;
-  --color-btn-cancel: #787C99;
-  --color-text-main: #C0CAF5;
-  --color-text-light: #A9B1D6;
-  --color-text-muted: #787C99;
-  --color-text-bot: #9AA5CE;
-  --color-shadow: 0 4px 24px rgba(0,0,0,0.25);
-  --color-shadow-light: 0 2px 8px rgba(0,0,0,0.2);
-  --color-shadow-accent: 0 2px 8px rgba(187, 154, 247, 0.1);
-  --color-shadow-event: 0 8px 32px rgba(0,0,0,0.25);
-  --color-shadow-circle: 0 0 8px rgba(187, 154, 247, 0.5);
-  --color-shadow-calendar: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --color-bg-overlay: rgba(0, 0, 0, 0.7);
-  --color-bg-btn-hover: rgba(169, 177, 214, 0.1);
-} */

@@ -134,25 +134,6 @@ const TaskList = () => {
       caretColor: '#333',
       width: '100%',
     },
-    addButton: {
-      position: 'absolute',
-      right: '10px',
-      bottom: '10px',
-      backgroundColor: '#ffc0cb',
-      color: '#1E1E1E',
-      borderRadius: '50%',
-      fontSize: '2rem',
-      padding: '0 10px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      border: '2px solid #1E1E1E',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-      zIndex: 2,
-      minWidth: '44px',
-      minHeight: '44px',
-    },
     
     dragHandle: {
       opacity: 0,
@@ -169,7 +150,7 @@ const TaskList = () => {
       color: '#1E1E1E',
     },
     dragging: {
-      background: '#ffe4e1',
+      background: 'var(--color-accent-muted)',
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
       zIndex: 10,
     },
@@ -248,7 +229,9 @@ const TaskList = () => {
                 </svg>
               )}
             </div>
-            {(task.editing || (isAdding && index === tasks.length - 1 && task.text === '')) ? (
+            {task.completed ? (
+              <span style={styles.text(task.completed)}>{task.text}</span>
+            ) : (task.editing || (isAdding && index === tasks.length - 1 && task.text === '')) ? (
               <input
                 ref={inputRef}
                 style={styles.input}
@@ -263,6 +246,7 @@ const TaskList = () => {
             ) : (
               <span style={styles.text(task.completed)}>{task.text}</span>
             )}
+
             {/* Delete button at the right end, only visible on hover */}
             <button
               type="button"

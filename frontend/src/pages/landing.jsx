@@ -2,13 +2,15 @@ import { useEffect, useState, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import ScrollReveal from '../components/ScrollReveal';
-// import Footer from "../components/Footer"
-
+import Footer from '../components/Footer';
+import Stars from '../components/Stars';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Landing() {
   const [loading, setLoading] = useState(true);
   const [showAfterLoad, setShowAfterLoad] = useState(false);
   const [flowers, setFlowers] = useState([]);
+  const [theme, setTheme] = useState('cherry');
   const flowerId = useRef(0);
   const logoRef = useRef(null);
   const containerRef = useRef(null);
@@ -41,7 +43,7 @@ export default function Landing() {
         {
           id: flowerId.current++,
           left: Math.random() * 92 + 2, // 2vw to 94vw
-          size: Math.random() * 12 + 42,
+          size: Math.random() * 32 + 32, // 32px to 64px
           duration: Math.random() * 2 + 4, // 4s to 6s
           delay: Math.random() * 2, // 0-2s
           rotate: Math.random() > 0.5 ? 1 : -1,
@@ -59,24 +61,14 @@ export default function Landing() {
     }
   }, [flowers, showAfterLoad]);
 
-  // Add controlled scroll behavior
-  // useEffect(() => {
-  //   const container = containerRef.current;
-  //   if (!container) return;
+  // Ensure correct theme on landing page
+  useEffect(() => {
+    document.body.classList.remove('cherry-theme', 'night-theme');
+    document.body.classList.add(theme === 'night' ? 'night-theme' : 'cherry-theme');
+  }, [theme]);
 
-  //   const handleWheel = (e) => {
-  //     e.preventDefault();
-  //     const scrollAmount = 1000;
-  //     const direction = Math.sign(e.deltaY);
-  //     container.scrollBy({
-  //       top: direction * scrollAmount,
-  //       behavior: 'smooth'
-  //     });
-  //   };
-
-  //   container.addEventListener('wheel', handleWheel, { passive: false });
-  //   return () => container.removeEventListener('wheel', handleWheel);
-  // }, []);
+  // Only toggle between 'cherry' and 'night'
+  const toggleTheme = () => setTheme(theme === 'night' ? 'cherry' : 'night');
 
   return (
     <div
@@ -129,73 +121,77 @@ export default function Landing() {
       <AnimatePresence>
         {showAfterLoad && (
           <>
-            {/* Upper branch background - now fixed at the top */}
-            <motion.img
-              src="images/right.png"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, ease: [0.77, 0, 0.18, 1] }}
-              style={{
+            {/* Upper branch background - only shown in cherry theme */}
+            {theme === 'cherry' && (
+              <motion.img
+                src="images/right.png"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, ease: [0.77, 0, 0.18, 1] }}
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  right: -90,
+                  width: 'min(1000px, 80vw)',
+                  maxWidth: '60vw',
+                  maxHeight: '60vh',
+                  height: 'auto',
+                  zIndex: -1,
+                  pointerEvents: "none",
+                  userSelect: "none"
+                }}
+                alt=""
+              />
+            )}
+            {/* Animated falling flowers - only in cherry theme */}
+            {theme === 'cherry' && (
+              <div style={{
                 position: "fixed",
+                left: 0,
                 top: 0,
-                right: -90,
-                width: 'min(1000px, 80vw)',
-                maxWidth: '60vw',
-                maxHeight: '60vh',
-                height: 'auto',
-                zIndex: 1,
+                width: "100%",
+                height: "100vh",
                 pointerEvents: "none",
-                userSelect: "none"
-              }}
-              alt=""
-            />
-            {/* Animated falling flowers */}
-            <div style={{
-              position: "fixed",
-              left: 0,
-              top: 0,
-              width: "100%",
-              height: "100vh",
-              pointerEvents: "none",
-              zIndex: 0,
-              overflow: "hidden"
-            }}>
-              {flowers.map(flower => (
-                <motion.img
-                  key={flower.id}
-                  src={`images/${flower.type}`}
-                  alt=""
-                  initial={{
-                    y: -flower.size,
-                    x: 0,
-                    opacity: 0.7,
-                    rotate: 0,
-                  }}
-                  animate={{
-                    y: "100vh",
-                    opacity: [0.7, 1, 0.7],
-                    rotate: flower.rotate * 60,
-                  }}
-                  transition={{
-                    duration: flower.duration,
-                    delay: flower.delay,
-                    ease: [0.45, 0, 0.55, 1]
-                  }}
-                  style={{
-                    position: "absolute",
-                    left: `${flower.left}vw`,
-                    width: flower.size,
-                    height: flower.size,
-                    pointerEvents: "none",
-                    zIndex: 0,
-                    filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.08))"
-                  }}
-                  onAnimationComplete={() => {
-                    setFlowers(prev => prev.filter(f => f.id !== flower.id));
-                  }}
-                />
-              ))}
-            </div>
+                zIndex: 0,
+                overflow: "hidden"
+              }}>
+                {flowers.map(flower => (
+                  <motion.img
+                    key={flower.id}
+                    src={`images/${flower.type}`}
+                    alt=""
+                    initial={{
+                      y: -flower.size,
+                      x: 0,
+                      opacity: 0.7,
+                      rotate: 0,
+                    }}
+                    animate={{
+                      y: "100vh",
+                      opacity: [0.7, 1, 0.7],
+                      rotate: flower.rotate * 60,
+                    }}
+                    transition={{
+                      duration: flower.duration,
+                      delay: flower.delay,
+                      ease: [0.45, 0, 0.55, 1]
+                    }}
+                    style={{
+                      position: "absolute",
+                      left: `${flower.left}vw`,
+                      width: flower.size,
+                      height: flower.size,
+                      pointerEvents: "none",
+                      zIndex: 0,
+                      filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.08))"
+                    }}
+                    onAnimationComplete={() => {
+                      setFlowers(prev => prev.filter(f => f.id !== flower.id));
+                    }}
+                  />
+                ))}
+              </div>
+            )}
             {/* Logo and button now scroll with the page, with animation */}
             <motion.div
               ref={logoRef}
@@ -225,7 +221,7 @@ export default function Landing() {
                   }}
                 >
                   <img
-                    src="images/donnatext.png"
+                    src={theme === 'night' ? "images/donnatext-night.png" : "images/donnatext.png"}
                     alt="Donna"
                     style={styles.donnaTextImg}
                   />
@@ -256,7 +252,7 @@ export default function Landing() {
                       style={styles.buttonTextWrapper}
                       variants={{
                         rest: { color: 'var(--color-text-main)' },
-                        hover: { color: '#FEF9F1' }
+                        hover: { color: 'var(--color-text-light)' }
                       }}
                       transition={{ duration: 0.25 }}
                     >
@@ -287,7 +283,7 @@ export default function Landing() {
               overflow: "hidden"
             }}
           >
-            <div
+            <motion.div
               style={{
                 position: "absolute",
                 top: "50%",
@@ -300,19 +296,101 @@ export default function Landing() {
                 padding: "0 8vw",
                 boxSizing: "border-box"
               }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              viewport={{ root: containerRef }}
             >
-              <ScrollReveal
-                scrollContainerRef={containerRef}
-                containerClassName="scroll-reveal-custom"
-                textClassName="scroll-reveal-text-custom"
-              >
-                Donna is your all-in-one personal workspace, powered by an intelligent AI assistant. It helps you stay organized and productive by handling tasks like scheduling meetings, setting reminders, taking notes, and more. Whether you're managing your day or planning ahead, Donna acts as your smart companion — always ready to assist.
-              </ScrollReveal>
-            </div>
+              <div style={styles.aboutContainer}>
+                <motion.div
+                  style={styles.aboutHeader}
+                  initial={{ y: 50, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  viewport={{ root: containerRef }}
+                >
+                  <h2 style={styles.aboutTitle}>Meet Donna</h2>
+                </motion.div>
+
+                <motion.div
+                  style={styles.aboutContent}
+                  initial={{ y: 30, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  viewport={{ root: containerRef }}
+                >
+                  <div style={styles.featureGrid}>
+                    <motion.div
+                      style={styles.featureCard}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={styles.featureIcon}>🗓️</div>
+                      <h3 style={styles.featureTitle}>Smart Scheduling</h3>
+                      <p style={styles.featureText}>Effortlessly manage your calendar and never miss important meetings</p>
+                    </motion.div>
+
+                    <motion.div
+                      style={styles.featureCard}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={styles.featureIcon}>📝</div>
+                      <h3 style={styles.featureTitle}>Intelligent Notes</h3>
+                      <p style={styles.featureText}>Capture thoughts instantly with AI-powered organization and search</p>
+                    </motion.div>
+
+                    <motion.div
+                      style={styles.featureCard}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={styles.featureIcon}>⚡</div>
+                      <h3 style={styles.featureTitle}>Lightning Fast</h3>
+                      <p style={styles.featureText}>Get instant responses and seamless performance across all devices</p>
+                    </motion.div>
+                  </div>
+
+                  <motion.div
+                    style={styles.mainDescription}
+                    initial={{ y: 20, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    viewport={{ root: containerRef }}
+                  >
+                    <p style={styles.descriptionText}>
+                      Donna is your all-in-one personal workspace, powered by an intelligent AI assistant that adapts to your unique workflow. 
+                      Whether you're managing daily tasks, planning projects, or staying connected with your team, Donna evolves with you — 
+                      becoming smarter and more helpful every day.
+                    </p>
+                  </motion.div>
+
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </>
       )}
+      {/* Stars animation only in night mode, after loading */}
+      {showAfterLoad && theme === 'night' && <Stars />}
+      {/* Footer only after loading, pass theme/toggleTheme/ThemeToggle */}
+      {showAfterLoad && (
+        <Footer
+          theme={theme}
+          toggleTheme={toggleTheme}
+          ThemeToggle={ThemeToggle}
+        />
+      )}
+      {/* Add theme background CSS */}
       <style>{`
+        body.cherry-theme {
+          background: #E3EBFF !important;
+          transition: background 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        body.night-theme {
+          background: #181a24 !important;
+          transition: background 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
         .scroll-reveal-custom {
           width: 100%;
           margin: 0;
@@ -325,7 +403,6 @@ export default function Landing() {
           word-break: break-word;
         }
       `}</style>
-      {/* <Footer /> */}
     </div>
   );
 }
@@ -451,5 +528,72 @@ const styles = {
     transformOrigin: 'left center',
     scaleX: 0,
     transition: 'scaleX 0.45s cubic-bezier(.77,0,.18,1)'
-  }
+  },
+  // New enhanced about section styles
+  aboutContainer: {
+    maxWidth: '1200px',
+    width: '100%',
+    padding: '0 2rem',
+    textAlign: 'center',
+  },
+  aboutHeader: {
+    marginBottom: '3rem',
+  },
+  aboutTitle: {
+    fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+    fontWeight: '700',
+    margin: 0,
+    marginBottom: '1rem',
+    color: 'var(--color-text-main)',
+  },
+  aboutContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '3rem',
+  },
+  featureGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '2rem',
+    marginBottom: '2rem',
+  },
+  featureCard: {
+    backgroundColor: ' rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid var(--color-border-light, rgba(255, 255, 255, 0.2))',
+    borderRadius: '20px',
+    padding: '2rem',
+    textAlign: 'center',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    cursor: 'pointer',
+  },
+  featureIcon: {
+    fontSize: '3rem',
+    marginBottom: '1rem',
+    display: 'block',
+  },
+  featureTitle: {
+    fontSize: '1.5rem',
+    fontWeight: '600',
+    margin: '0 0 1rem 0',
+    color: 'var(--color-text-main)',
+  },
+  featureText: {
+    fontSize: '1rem',
+    color: 'var(--color-text-secondary, var(--color-text-main))',
+    lineHeight: '1.6',
+    margin: 0,
+    opacity: 0.8,
+  },
+  mainDescription: {
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+  descriptionText: {
+    fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+    lineHeight: '1.7',
+    color: 'var(--color-text-main)',
+    margin: 0,
+    opacity: 0.9,
+  },
 };

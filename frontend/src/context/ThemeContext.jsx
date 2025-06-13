@@ -1,30 +1,44 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const ThemeContext = createContext();
+// All available themes
+const THEMES = ['cherry', 'blue', 'dark', 'night'];
+const DEFAULT_LIGHT = 'cherry';
+const DEFAULT_DARK = 'night';
 
-export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+// Workspace Theme Context (persistent)
+const WorkspaceThemeContext = createContext();
+
+export const WorkspaceThemeProvider = ({ children }) => {
+  const getInitialTheme = () => {
+    const saved = localStorage.getItem('workspace-theme');
+    if (saved && THEMES.includes(saved)) return saved;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? DEFAULT_DARK : DEFAULT_LIGHT;
+  };
+
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
-    // Apply theme class to body
-    document.body.className = theme === 'dark' ? 'dark-theme' : 'light-theme';
+    document.body.classList.remove(...THEMES.map(t => `${t}-theme`));
+    document.body.classList.add(`${theme}-theme`);
+    localStorage.setItem('workspace-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setTheme(prev => (prev === 'dark' || prev === 'night') ? DEFAULT_LIGHT : DEFAULT_DARK);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <WorkspaceThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
-    </ThemeContext.Provider>
+    </WorkspaceThemeContext.Provider>
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
+export const useWorkspaceTheme = () => {
+  const context = useContext(WorkspaceThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useWorkspaceTheme must be used within a WorkspaceThemeProvider');
   }
   return context;
-}; 
+};

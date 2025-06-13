@@ -1,8 +1,9 @@
 import styled from 'styled-components';
-import { useTheme } from '../context/ThemeContext';
 
-const ThemeToggle = () => {
-  const { theme, toggleTheme } = useTheme();
+// Accept theme and onToggle as props for controlled usage
+const ThemeToggle = ({ theme, onToggle }) => {
+  // Determine checked state: checked if dark or night theme
+  const checked = theme === 'dark' || theme === 'night';
 
   return (
     <StyledWrapper>
@@ -10,8 +11,8 @@ const ThemeToggle = () => {
         <input
           type="checkbox"
           className="theme-switch__checkbox"
-          onChange={toggleTheme}
-          checked={theme === 'dark'}
+          onChange={onToggle}
+          checked={checked}
         />
         <div className="theme-switch__container">
           <div className="theme-switch__clouds" />
@@ -21,7 +22,7 @@ const ThemeToggle = () => {
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
-                d="M135.831 3.00688C135.055 3.85027..."
+                d="M10 10h10v10H10z" // <-- Replace with a simple valid path for demo
                 fill="currentColor"
               />
             </svg>
