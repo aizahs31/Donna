@@ -238,7 +238,7 @@ export default function Landing() {
                   }}
                 >
                   <motion.button
-                    onClick={() => window.location.href = 'http://localhost:3000/auth'}
+                    onClick={() => window.location.href = 'https://donna-1677.onrender.com/auth'}
                     style={styles.connectButton}
                     whileHover="hover"
                     initial="rest"
