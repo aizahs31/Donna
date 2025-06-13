@@ -1,7 +1,7 @@
-#Donna – AI Productivity Assistant
+# Donna – AI Productivity Assistant
 Donna is a smart, AI-powered workspace that helps you manage tasks, calendar events, and focus time — all in one clean, interactive interface.
 
-##✨ Features
+## ✨ Features
 🤖 AI Chat (Gemini 2.0): Add/update/delete tasks & events via natural language
 
 ✅ Task Manager: Voice + UI control, drag-and-drop, persistent storage
@@ -12,14 +12,14 @@ Donna is a smart, AI-powered workspace that helps you manage tasks, calendar eve
 
 🎵 Ambient Workspace: Optional Spotify music, quotes, responsive design
 
-##🛠 Tech Stack
+## 🛠 Tech Stack
 Frontend: React, Vite, Framer Motion
 
 Backend: Node.js, Express, Google APIs
 
 API Integrations: Gemini, Google Calendar, Spotify
 
-##🚀 Setup
+## 🚀 Setup
 ```
 git clone <repo>
 cd backend && npm install
@@ -43,9 +43,8 @@ cd backend && npm run dev
 cd ../frontend && npm run dev
 ```
 
-##💬 Sample Commands
+## 💬 Sample Commands
 “Add a task to review PRs”
-
 “Cancel my 2 PM meeting”
 
 Built with ❤️ by the Ryze.
