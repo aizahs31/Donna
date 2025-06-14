@@ -62,7 +62,7 @@ export default function Footer({ theme, toggleTheme, ThemeToggle }) {
       <div style={contentStyle}>
         <p style={taglineStyle}>Designed & Built by Ryze 🌸</p>
         <div>
-          {["GitHub", "LinkedIn", "shaziafarheen10@gmail.com"].map((text, i) => {
+          {["GitHub", "LinkedIn", "Email"].map((text, i) => {
             const hrefs = [
               "https://github.com/aizahs31",
               "https://www.linkedin.com/in/shazia-mohommed",

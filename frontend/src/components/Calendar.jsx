@@ -22,7 +22,7 @@ const Calendar = forwardRef((props, ref) => {
     const range = getRangeParam(activeTab);
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/events?range=${range}`);
+      const response = await fetch(`https://donna-1677.onrender.com/events?range=${range}`);
       if (!response.ok) {
         throw new Error('Failed to fetch events');
       }
