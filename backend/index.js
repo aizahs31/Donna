@@ -281,7 +281,7 @@ app.get('/auth/callback', async (req, res) => {
     // Always update token.json with the latest tokens
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
     // Redirect to frontend workspace after successful auth
-    res.redirect('http://localhost:5173/workspace');
+    res.redirect('https://yourdonna.netlify.app/workspace');
   } catch (err) {
     console.error(err);
     res.status(500).send('Authentication failed');
