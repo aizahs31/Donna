@@ -347,7 +347,7 @@ export default function Landing() {
                     >
                       <div style={styles.featureIcon}>⚡</div>
                       <h3 style={styles.featureTitle}>Lightning Fast</h3>
-                      <p style={styles.featureText}>Get instant responses and seamless performance across all devices</p>
+                      <p style={styles.featureText}>Instantly set up calendar meeting</p>
                     </motion.div>
                   </div>
 

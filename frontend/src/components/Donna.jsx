@@ -14,11 +14,28 @@ const Donna = ({ calendarRef }) => {
     setInput("");
     setLoading(true);
 
+    const contextMessages = messages.slice(-10).map(m => ({
+      role: m.from === "user" ? "user" : "model",
+      parts: [{ text: m.text }]
+    }));
+
+    let tasks = [];
     try {
-      const res = await fetch("https://donna-1677.onrender.com/chat", {
+      tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    } catch (e) {
+      console.warn("Failed to parse tasks from localStorage", e);
+      tasks = [];
+    }
+
+    try {
+      const res = await fetch('https://donna-1677.onrender.com/chat', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({
+          message: input,
+          context: contextMessages,
+          tasks: tasks
+        })
       });
 
       const data = await res.json();

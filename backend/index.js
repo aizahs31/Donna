@@ -20,16 +20,16 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-const TOKEN_PATH = '/tmp/token.json';
+const TOKEN_PATH = './token.json';
 
 // Load tokens from disk if available
 if (fs.existsSync(TOKEN_PATH)) {
   try {
     const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
     oauth2Client.setCredentials(tokens);
-    console.log('✅ Loaded Google OAuth tokens from /temp.');
+    console.log('✅ Loaded Google OAuth tokens from /tmp.');
   } catch (e) {
-    console.error('Failed to load tokens from /temp', e);
+    console.error('Failed to load tokens from /tmp', e);
   }
 }
 
@@ -37,7 +37,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 // Enhanced system prompt with calendar and task capabilities
-const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Ryze. Always refer to yourself as Donna and answer in a warm, concise, and helpful manner, and witty at times. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar and task management system, so you can help with scheduling, reminders, and task organization.
+const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Shazia. Always refer to yourself as Donna and answer in a warm, concise, and helpful manner, and witty. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar and task management system, so you can help with scheduling, reminders, and task organization.
 
 When processing requests, you can handle:
 
@@ -94,32 +94,35 @@ For non-calendar/task requests, respond normally as a helpful assistant.
 Always respond in a way that feels like a conversation with a friend.`;
 
 app.post("/chat", async (req, res) => {
-  const { message } = req.body;
+  const { message, context = [], tasks = [] } = req.body;
 
   try {
     // Add current date/time context to the user's message with timezone
     const now = new Date();
     const timeZone = "Asia/Kolkata";
-    const messageWithContext = `[Current date and time: ${now.toLocaleString("en-US", { timeZone })} | Time Zone: ${timeZone}] ${message}`;
+    const messageWithContext = `[Current date and time: ${now.toLocaleString("en-US", { timeZone })} | Time Zone: ${timeZone}]
+      ${message}
 
-    console.log("Sending to Gemini:", messageWithContext);
+      Here are the user's current tasks:
+      ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).join("\n")}`;
+
+    const contents = [
+      { role: "model", parts: [{ text: systemPrompt }] },
+      ...context,
+      { role: "user", parts: [{ text: messageWithContext }] }
+    ];
+
+    console.log("Sending to Gemini:", contents);
 
     const response = await axios.post(
       GEMINI_URL,
-      {
-        contents: [
-          { role: "model", parts: [{ text: systemPrompt }] },
-          { role: "user", parts: [{ text: messageWithContext }] }
-        ]
-      },
-      {
-        headers: { "Content-Type": "application/json" }
-      }
+      { contents },
+      { headers: { "Content-Type": "application/json" } }
     );
 
     const replyText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Donna.";
     console.log("Gemini Response:", replyText);
-    
+
     // Try to parse the response as JSON
     let jsonResponse;
     try {
