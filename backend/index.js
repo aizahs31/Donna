@@ -20,6 +20,19 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
+const TOKEN_PATH = '/tmp/token.json';
+
+// Load tokens from disk if available
+if (fs.existsSync(TOKEN_PATH)) {
+  try {
+    const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
+    oauth2Client.setCredentials(tokens);
+    console.log('✅ Loaded Google OAuth tokens from /temp.');
+  } catch (e) {
+    console.error('Failed to load tokens from /temp', e);
+  }
+}
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -167,7 +180,7 @@ app.post("/chat", async (req, res) => {
             });
             
             console.log("Calendar event created:", calendarResponse.data);
-            res.json({ reply: "Done! The meeting has been scheduled.", action: "calendar_created" });
+            res.json({ reply: "Done! The event has been scheduled.", action: "calendar_created" });
           } catch (calendarError) {
             console.error("Failed to create calendar event:", calendarError);
             res.json({ reply: "Sorry, I couldn't schedule the event. Please try again." });
@@ -381,19 +394,6 @@ app.delete('/events/:eventId', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete event' });
   }
 });
-
-const TOKEN_PATH = './token.json';
-
-// Load tokens from disk if available
-if (fs.existsSync(TOKEN_PATH)) {
-  try {
-    const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
-    oauth2Client.setCredentials(tokens);
-    console.log('✅ Loaded Google OAuth tokens from disk.');
-  } catch (e) {
-    console.error('Failed to load tokens from disk:', e);
-  }
-}
 
 app.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);
