@@ -37,40 +37,36 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 // Enhanced system prompt with calendar and task capabilities
-const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Shazia. Always refer to yourself as Donna and answer in a warm, concise, and helpful manner, and witty. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar and task management system, so you can help with scheduling, reminders, and task organization.
+const systemPrompt = `You are Donna, a friendly and helpful AI assistant for the user's personal workspace, built by Shazia. Always refer to yourself as Donna and answer in a warm, concise, helpful, and witty manner. Always all ears for personal growth, strengthening mindsets, and being realistic. You are connected to the user's calendar and task management system, so you can help with scheduling, reminders, and task organization.
 
-When processing requests, you can handle:
+When processing requests, respond ONLY in the following JSON formats:
 
-1. CALENDAR EVENTS - For creating/scheduling events, respond with ONLY this JSON format:
+1. CALENDAR EVENTS
 {
   "type": "calendar_event",
   "event": {
     "summary": "Event title",
-    "start": "Local date time string (e.g., 2024-03-20T14:00:00)",
-    "end": "Local date time string (e.g., 2024-03-20T15:00:00)",
-    "description": "Optional event description",
-    "timeZone": "User's time zone (from context)"
+    "start": "2024-03-20T14:00:00",
+    "end": "2024-03-20T15:00:00",
+    "description": "",
+    "timeZone": "Asia/Kolkata",
+    "query": "Optional search term if updating an existing event"
   }
 }
 
-2. DELETE CALENDAR EVENTS - For deleting events, respond with ONLY this JSON format:
+2. DELETE CALENDAR EVENTS
 {
   "type": "delete_calendar_event",
   "query": "search terms to find the event to delete"
 }
 
-3. TASK MANAGEMENT - For task operations, respond with ONLY this JSON format:
-
-For adding tasks:
+3. TASK MANAGEMENT
+- Add:
 {
   "type": "add_task",
-  "task": {
-    "text": "Task description",
-    "completed": false
-  }
+  "task": { "text": "Task description", "completed": false }
 }
-
-For updating tasks:
+- Update:
 {
   "type": "update_task",
   "task": {
@@ -81,30 +77,25 @@ For updating tasks:
     }
   }
 }
-
-For deleting tasks:
+- Delete:
 {
   "type": "delete_task",
   "query": "search terms to find the task to delete"
 }
 
-Use the current date and time (provided in the user's message) as context for relative times like "tomorrow", "next week", etc.
-
-For non-calendar/task requests, respond normally as a helpful assistant.
-Always respond in a way that feels like a conversation with a friend.`;
+Use current date/time context for terms like "tomorrow". For all other questions, respond conversationally like a warm friend.`
 
 app.post("/chat", async (req, res) => {
   const { message, context = [], tasks = [] } = req.body;
 
   try {
-    // Add current date/time context to the user's message with timezone
     const now = new Date();
     const timeZone = "Asia/Kolkata";
     const messageWithContext = `[Current date and time: ${now.toLocaleString("en-US", { timeZone })} | Time Zone: ${timeZone}]
-      ${message}
+${message}
 
-      Here are the user's current tasks:
-      ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).join("\n")}`;
+Here are the user's current tasks:
+${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).join("\n")}`;
 
     const contents = [
       { role: "model", parts: [{ text: systemPrompt }] },
@@ -123,165 +114,134 @@ app.post("/chat", async (req, res) => {
     const replyText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Donna.";
     console.log("Gemini Response:", replyText);
 
-    // Try to parse the response as JSON
     let jsonResponse;
     try {
-      // First, try to extract JSON from markdown code blocks
       const codeBlockMatch = replyText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        // Found JSON in code block
-        jsonResponse = JSON.parse(codeBlockMatch[1]);
-        console.log("Extracted JSON from code block:", jsonResponse);
-      } else if (replyText.includes('"type":')) {
-        // Try direct JSON parsing if no code block but contains type signature
-        const jsonMatch = replyText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          jsonResponse = JSON.parse(jsonMatch[0]);
-          console.log("Extracted direct JSON:", jsonResponse);
-        }
+      const rawJson = codeBlockMatch ? codeBlockMatch[1] : (replyText.includes('"type":') ? replyText.match(/\{[\s\S]*\}/)?.[0] : null);
+      if (rawJson) {
+        jsonResponse = JSON.parse(rawJson);
+        console.log("Parsed JSON:", jsonResponse);
       }
     } catch (e) {
-      console.log("JSON parsing error:", e);
-      // Not a JSON response or invalid JSON, send the normal text response
-      const reply = marked.parse(replyText);
-      res.json({ reply });
-      return;
+      console.warn("Failed JSON parsing:", e);
     }
 
-    // Handle different types of JSON responses
     if (jsonResponse) {
+      const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
       switch (jsonResponse.type) {
         case "calendar_event":
           try {
-            console.log("Creating calendar event with data:", jsonResponse.event);
-            const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-            
-            if (!jsonResponse.event.start || !jsonResponse.event.end) {
-              throw new Error("Missing start or end time");
-            }
+            const { summary, start, end, description, timeZone: tz, query } = jsonResponse.event;
+            if (!start || !end) throw new Error("Missing start or end time");
 
-            const event = {
-              summary: jsonResponse.event.summary,
-              start: { 
-                dateTime: jsonResponse.event.start,
-                timeZone: jsonResponse.event.timeZone || timeZone
-              },
-              end: { 
-                dateTime: jsonResponse.event.end,
-                timeZone: jsonResponse.event.timeZone || timeZone
-              },
-              description: jsonResponse.event.description,
+            const eventPayload = {
+              summary,
+              description,
+              start: { dateTime: start, timeZone: tz || timeZone },
+              end: { dateTime: end, timeZone: tz || timeZone },
               reminders: {
                 useDefault: false,
-                overrides: [{ method: 'popup', minutes: 10 }],
-              },
+                overrides: [{ method: 'popup', minutes: 10 }]
+              }
             };
-            
-            const calendarResponse = await calendar.events.insert({
-              calendarId: 'primary',
-              resource: event,
-            });
-            
-            console.log("Calendar event created:", calendarResponse.data);
-            res.json({ reply: "Done! The event has been scheduled.", action: "calendar_created" });
+
+            if (query) {
+              // Update existing event
+              const search = await calendar.events.list({
+                calendarId: 'primary',
+                q: query,
+                timeMin: new Date().toISOString(),
+                maxResults: 1,
+                singleEvents: true,
+                orderBy: 'startTime'
+              });
+              const existingEvent = search.data.items?.[0];
+              if (existingEvent) {
+                const updated = await calendar.events.update({
+                  calendarId: 'primary',
+                  eventId: existingEvent.id,
+                  resource: { ...existingEvent, ...eventPayload }
+                });
+                console.log("Event updated:", updated.data);
+                return res.json({ reply: "Done! I've updated the event.", action: "calendar_updated" });
+              } else {
+                return res.json({ reply: "I couldn't find the event to update." });
+              }
+            } else {
+              // Create new event
+              const created = await calendar.events.insert({
+                calendarId: 'primary',
+                resource: eventPayload
+              });
+              console.log("Calendar event created:", created.data);
+              return res.json({ reply: "Done! The event has been scheduled.", action: "calendar_created" });
+            }
+
           } catch (calendarError) {
-            console.error("Failed to create calendar event:", calendarError);
-            res.json({ reply: "Sorry, I couldn't schedule the event. Please try again." });
+            console.error("Calendar creation/update failed:", calendarError);
+            return res.json({ reply: "Sorry, I couldn't schedule or update the event." });
           }
-          break;
 
         case "delete_calendar_event":
           try {
-            console.log("Deleting calendar event with query:", jsonResponse.query);
-            const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-            
-            // Search for events matching the query
-            const searchResponse = await calendar.events.list({
+            const { query } = jsonResponse;
+            const search = await calendar.events.list({
               calendarId: 'primary',
-              q: jsonResponse.query,
+              q: query,
               timeMin: new Date().toISOString(),
               maxResults: 10,
               singleEvents: true,
-              orderBy: 'startTime',
+              orderBy: 'startTime'
             });
 
-            const events = searchResponse.data.items;
-            if (events && events.length > 0) {
-              // Delete the first matching event
-              await calendar.events.delete({
-                calendarId: 'primary',
-                eventId: events[0].id,
-              });
-              
-              console.log("Calendar event deleted:", events[0].summary);
-              res.json({ reply: `Done! I've deleted the event "${events[0].summary}".`, action: "calendar_deleted" });
+            const events = search.data.items;
+            if (events.length > 0) {
+              await calendar.events.delete({ calendarId: 'primary', eventId: events[0].id });
+              return res.json({ reply: `Done! I deleted \"${events[0].summary}\".`, action: "calendar_deleted" });
             } else {
-              res.json({ reply: "I couldn't find any matching events to delete." });
+              return res.json({ reply: "Couldn't find any matching events." });
             }
           } catch (calendarError) {
-            console.error("Failed to delete calendar event:", calendarError);
-            res.json({ reply: "Sorry, I couldn't delete the event. Please try again." });
+            console.error("Delete failed:", calendarError);
+            return res.json({ reply: "Sorry, I couldn't delete the event." });
           }
-          break;
 
         case "add_task":
-          try {
-            console.log("Adding task:", jsonResponse.task);
-            res.json({ 
-              reply: `Done! I've added "${jsonResponse.task.text}" to your tasks.`, 
-              action: "task_added",
-              taskData: jsonResponse.task
-            });
-          } catch (taskError) {
-            console.error("Failed to add task:", taskError);
-            res.json({ reply: "Sorry, I couldn't add the task. Please try again." });
-          }
-          break;
+          return res.json({
+            reply: `Done! I’ve added “${jsonResponse.task.text}” to your tasks.`,
+            action: "task_added",
+            taskData: jsonResponse.task
+          });
 
         case "update_task":
-          try {
-            console.log("Updating task:", jsonResponse.task);
-            res.json({ 
-              reply: `Done! I've updated your task.`, 
-              action: "task_updated",
-              taskData: jsonResponse.task
-            });
-          } catch (taskError) {
-            console.error("Failed to update task:", taskError);
-            res.json({ reply: "Sorry, I couldn't update the task. Please try again." });
-          }
-          break;
+          return res.json({
+            reply: "Done! I’ve updated your task.",
+            action: "task_updated",
+            taskData: jsonResponse.task
+          });
 
         case "delete_task":
-          try {
-            console.log("Deleting task with query:", jsonResponse.query);
-            res.json({ 
-              reply: `Done! I've deleted the task.`, 
-              action: "task_deleted",
-              query: jsonResponse.query
-            });
-          } catch (taskError) {
-            console.error("Failed to delete task:", taskError);
-            res.json({ reply: "Sorry, I couldn't delete the task. Please try again." });
-          }
-          break;
+          return res.json({
+            reply: "Done! I’ve deleted the task.",
+            action: "task_deleted",
+            query: jsonResponse.query
+          });
 
         default:
-          console.log("Unknown JSON response type:", jsonResponse.type);
-          const reply = marked.parse(replyText);
-          res.json({ reply });
+          console.warn("Unknown structured response:", jsonResponse.type);
       }
-    } else {
-      // Not a structured response
-      console.log("Not a structured response, sending normal response");
-      const reply = marked.parse(replyText);
-      res.json({ reply });
     }
+
+    const reply = marked.parse(replyText);
+    return res.json({ reply });
+
   } catch (error) {
-    console.error("Donna (Gemini) REST API error:", error?.response?.data || error.message);
-    res.status(500).json({ error: "Failed to fetch response from Donna." });
+    console.error("Donna (Gemini) Error:", error?.response?.data || error.message);
+    return res.status(500).json({ error: "Donna encountered an issue processing your request." });
   }
 });
+
 
 // Auth routes
 app.get('/auth', (req, res) => {
