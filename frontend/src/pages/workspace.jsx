@@ -152,14 +152,32 @@ const Workspace = () => {
                       className={styles.themeOptionBtn + (pendingTheme === opt.key ? ' ' + styles.themeOptionBtnActive : '')}
                       onClick={() => setPendingTheme(opt.key)}
                       style={{
-                        border: pendingTheme === opt.key ? '2px solid var(--color-accent-dark)' : '2px solid var(--color-border)',
-                        background: 'var(--color-bg-main)',
-                        color: 'var(--color-text-main)',
+                        border: pendingTheme === opt.key
+                          ? (opt.key === 'cherry'
+                              ? '2px solid #D53169'
+                              : opt.key === 'blue'
+                              ? '2px solid #3196d5'
+                              : '2px solid #CDCDCD')
+                          : (opt.key === 'cherry'
+                              ? '2px solid #FFD8DF'
+                              : opt.key === 'blue'
+                              ? '2px solid #d8fdff'
+                              : '2px solid #CDCDCD'),
+                        background: opt.key === 'cherry'
+                          ? '#FFD8DF'
+                          : opt.key === 'blue'
+                          ? '#d8fdff'
+                          : '#E3EBFF',
+                        color: opt.key === 'cherry'
+                          ? '#D53169'
+                          : opt.key === 'blue'
+                          ? '#3196d5'
+                          : '#1E1E1E',
                         borderRadius: 12,
                         padding: '12px 18px',
                         fontWeight: 500,
                         cursor: 'pointer',
-                        boxShadow: pendingTheme === opt.key ? '0 2px 8px var(--color-shadow-accent)' : 'none',
+                        boxShadow: pendingTheme === opt.key ? '0 2px 8px rgba(243, 115, 115, 0.07)' : 'none',
                         outline: 'none',
                         transition: 'all 0.2s',
                         width: '100%',
@@ -181,14 +199,32 @@ const Workspace = () => {
                       className={styles.themeOptionBtn + (pendingTheme === opt.key ? ' ' + styles.themeOptionBtnActive : '')}
                       onClick={() => setPendingTheme(opt.key)}
                       style={{
-                        border: pendingTheme === opt.key ? '2px solid var(--color-accent-dark)' : '2px solid var(--color-border)',
-                        background: 'var(--color-bg-main)',
-                        color: 'var(--color-text-main)',
+                        border: pendingTheme === opt.key
+                          ? (opt.key === 'dark'
+                              ? '2px solid #c4c4c4'
+                              : opt.key === 'night'
+                              ? '2px solid #6f5896'
+                              : '2px solid #404040')
+                          : (opt.key === 'dark'
+                              ? '2px solid #303030'
+                              : opt.key === 'night'
+                              ? '2px solid #3d214c'
+                              : '2px solid #404040'),
+                        background: opt.key === 'dark'
+                          ? '#1F1F1F'
+                          : opt.key === 'night'
+                          ? '#3d214c'
+                          : '#1F1F1F',
+                        color: opt.key === 'dark'
+                          ? '#efefef'
+                          : opt.key === 'night'
+                          ? '#eeecf4'
+                          : '#efefef',
                         borderRadius: 12,
                         padding: '12px 18px',
                         fontWeight: 500,
                         cursor: 'pointer',
-                        boxShadow: pendingTheme === opt.key ? '0 2px 8px var(--color-shadow-accent)' : 'none',
+                        boxShadow: pendingTheme === opt.key ? '0 2px 8px rgba(187, 154, 247, 0.1)' : 'none',
                         outline: 'none',
                         transition: 'all 0.2s',
                         width: '100%',
