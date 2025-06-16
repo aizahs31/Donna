@@ -1,6 +1,29 @@
 import { useState } from "react";
 import quotes from "../data/quotes";
 
+const predefinedPlaylists = [
+    {
+        name: "Lo-fi Chill",
+        url: "https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4FyS8kM",
+        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c8bc80c95b9d248cf462c0bd1"
+    },
+    {
+        name: "Noice cancelling",
+        url: "https://open.spotify.com/playlist/37i9dQZF1DXcscxvxm7Pfv",
+        cover: "https://i.scdn.co/image/ab67706f00000002eaa1c23c286c6fed4e3f51a1"
+    },
+    {
+        name: "Binaural beats",
+        url: "https://open.spotify.com/playlist/37i9dQZF1DX2Ca9Q0E4D7d",
+        cover: "https://i.scdn.co/image/ab67706f00000002cd00bc48e0dd3b8d28bc431c"
+    },
+    {
+        name: "Deep focus",
+        url: "https://open.spotify.com/playlist/37i9dQZF1DWZeKCadgRdKQ",
+        cover: "https://i.scdn.co/image/ab67706f00000002f3ce4c5b615e345331a22830"
+    }
+];
+
 export default function ShowSpotify() {
     const [showPopup, setShowPopup] = useState(false);
     const [playlistUrl, setPlaylistUrl] = useState("");
@@ -51,7 +74,6 @@ export default function ShowSpotify() {
                 width: '100%',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                 position: 'relative',
-                // overflow: 'hidden',
             }}
             className="spotify-playlist-btn"
         >
@@ -70,7 +92,6 @@ export default function ShowSpotify() {
             position: 'relative',
         }}>
             {!showPlayer ? (
-                // Quote Display with Play Music Button on the left
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -80,7 +101,6 @@ export default function ShowSpotify() {
                     padding: '0 40px',
                     height: '100%'
                 }}>
-                    {/* Play Music Button */}
                     <div style={{
                         width: '80px',
                         flexShrink: 0,
@@ -92,8 +112,6 @@ export default function ShowSpotify() {
                             Play music
                         </SpotifyButton>
                     </div>
-
-                    {/* Quote Display */}
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -123,7 +141,6 @@ export default function ShowSpotify() {
                     </div>
                 </div>
             ) : (
-                // Spotify Player
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -131,9 +148,7 @@ export default function ShowSpotify() {
                     gap: '20px',
                     width: '100%',
                     height: '100%',
-                    // backgroundColor: 'var(--color-bg-overlay)',
                 }}>
-                    {/* Buttons Column */}
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -143,15 +158,16 @@ export default function ShowSpotify() {
                         justifyContent: 'center',
                         height: '100%',
                     }}>
-                        <SpotifyButton onClick={() => { setTempUrl(playlistUrl); setShowPopup(true); }}>
+                        <SpotifyButton onClick={() => {
+                            setTempUrl(playlistUrl);
+                            setShowPopup(true);
+                        }}>
                             Change playlist
                         </SpotifyButton>
                         <SpotifyButton onClick={() => setShowPlayer(false)}>
                             Close playlist
                         </SpotifyButton>
                     </div>
-
-                    {/* Spotify Embed */}
                     <iframe
                         style={{
                             borderRadius: '14px',
@@ -163,12 +179,11 @@ export default function ShowSpotify() {
                         src={embedUrl}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
-                        allowFullScreen=""
+                        allowFullScreen
                     ></iframe>
                 </div>
             )}
 
-            {/* Popup */}
             {showPopup && (
                 <div style={{
                     position: 'fixed',
@@ -187,7 +202,7 @@ export default function ShowSpotify() {
                         backgroundColor: 'var(--color-bg-panel)',
                         borderRadius: '15px',
                         border: '2px solid var(--color-border-dark)',
-                        maxWidth: '300px',
+                        maxWidth: '360px',
                         animation: 'modalSlide 0.3s ease',
                         padding: '32px 24px',
                         minWidth: 320,
@@ -196,24 +211,56 @@ export default function ShowSpotify() {
                         flexDirection: 'column',
                         alignItems: 'center',
                     }}>
-                        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 600, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>Paste your Spotify playlist link</h3>
-                        <input
-                            type="text"
-                            value={tempUrl}
-                            onChange={e => setTempUrl(e.target.value)}
-                            placeholder="Spotify playlist URL"
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                fontSize: '1rem',
-                                borderRadius: 10,
-                                border: '2px solid var(--color-border-dark)',
-                                marginBottom: 18,
-                                outline: 'none',
-                                backgroundColor: 'var(--color-accent-input)',
-                                color: 'var(--color-text-muted)',
-                            }}
-                        />
+                        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 600, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>
+                            Choose your playlist
+                        </h3>
+
+                        {/* Horizontal Scrollable Playlist Previews */}
+                        <div style={{
+                            display: 'flex',
+                            overflowX: 'auto',
+                            gap: '16px',
+                            paddingBottom: '12px',
+                            width: '100%',
+                            scrollbarWidth: 'thin'
+                        }}>
+                            {predefinedPlaylists.map((p, idx) => {
+                                const isSelected = tempUrl === p.url;
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => setTempUrl(p.url)}
+                                        style={{
+                                            minWidth: '120px',
+                                            cursor: 'pointer',
+                                            border: isSelected ? '2px solid var(--color-border-dark)' : '2px solid transparent',
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            boxShadow: isSelected
+                                                ? '0 4px 12px rgba(0,0,0,0.15)'
+                                                : '0 2px 6px rgba(0,0,0,0.1)',
+                                            transition: 'all 0.2s ease',
+                                            background: 'var(--color-accent-input)',
+                                            textAlign: 'center',
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <img
+                                            src={p.cover}
+                                            alt={p.name}
+                                            style={{ width: '100%', height: '120px', objectFit: 'cover' }}
+                                        />
+                                        <p style={{
+                                            fontSize: '0.9rem',
+                                            fontWeight: 500,
+                                            margin: '8px 0',
+                                            color: 'var(--color-text-main)'
+                                        }}>{p.name}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
                         <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'center' }}>
                             <button
                                 onClick={handleCancel}
@@ -273,10 +320,15 @@ export default function ShowSpotify() {
                 .spotify-playlist-btn:hover span {
                     color: #FEF9F1 !important;
                 }
-                @media (max-width: 900px) {
-                    .spotify-playlist-btn {
-                        display: none !important;
-                    }
+                ::-webkit-scrollbar {
+                    height: 6px;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background: rgba(100,100,100,0.4);
+                    border-radius: 4px;
+                }
+                ::-webkit-scrollbar-track {
+                    background: transparent;
                 }
             `}</style>
         </div>
