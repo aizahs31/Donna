@@ -116,7 +116,7 @@ const Donna = ({ calendarRef }) => {
     border: '2px solid var(--color-border)',
     padding: '1rem',
     borderRadius: '10px',
-    height: '100%',
+    height: '80vh',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
