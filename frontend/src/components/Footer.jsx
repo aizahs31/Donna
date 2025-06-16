@@ -60,7 +60,7 @@ export default function Footer({ theme, toggleTheme, ThemeToggle }) {
     <footer style={footerStyle}>
       <div style={patternStyle} />
       <div style={contentStyle}>
-        <p style={taglineStyle}>Designed & Built by Ryze 🌸</p>
+        <p style={taglineStyle}>Designed & Built by Shazia 🌸</p>
         <div>
           {["GitHub", "LinkedIn", "Email"].map((text, i) => {
             const hrefs = [

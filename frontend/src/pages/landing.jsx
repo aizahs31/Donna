@@ -14,6 +14,7 @@ export default function Landing() {
   const flowerId = useRef(0);
   const logoRef = useRef(null);
   const containerRef = useRef(null);
+  const aboutSectionRef = useRef(null); // Add ref for About section
 
   // Use Framer Motion's useScroll with the custom container
   const { scrollY } = useScroll({ container: containerRef });
@@ -226,7 +227,7 @@ export default function Landing() {
                     style={styles.donnaTextImg}
                   />
                   <p style={styles.assistantText}>
-                    Your personal assistant
+                    Your personal workspace
                   </p>
                 </motion.div>
                 <motion.div
@@ -268,6 +269,7 @@ export default function Landing() {
                     />
                   </motion.button>
                 </motion.div>
+                {/* Remove scroll indicator from logo area */}
               </div>
             </motion.div>
           </>
@@ -280,10 +282,12 @@ export default function Landing() {
               position: "relative",
               minHeight: "100vh",
               width: "100%",
-              overflow: "hidden"
+              overflow: "hidden",
+              paddingBottom: "200px"
             }}
           >
             <motion.div
+              ref={aboutSectionRef}
               style={{
                 position: "absolute",
                 top: "50%",
@@ -313,41 +317,78 @@ export default function Landing() {
                 </motion.div>
 
                 <motion.div
-                  style={styles.aboutContent}
+                  style={{
+                    ...styles.aboutContent,
+                    alignItems: "center"
+                  }}
                   initial={{ y: 30, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                   viewport={{ root: containerRef }}
                 >
-                  <div style={styles.featureGrid}>
+                  <div style={{
+                    ...styles.featureGrid,
+                    gap: '2.2rem', // increased gap for more spacing
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    justifyItems: 'center',
+                    alignItems: 'center',
+                    margin: '0 auto',
+                    maxWidth: 900 // allow more space for the grid
+                  }}>
+                    {/* Cards: smaller, closer, centered */}
                     <motion.div
-                      style={styles.featureCard}
-                      whileHover={{ scale: 1.05, y: -5 }}
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                      <div style={styles.featureIcon}>🗓️</div>
-                      <h3 style={styles.featureTitle}>Smart Scheduling</h3>
-                      <p style={styles.featureText}>Effortlessly manage your calendar and never miss important meetings</p>
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>🤖</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>AI Chat Assistant</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Talk to Donna naturally to manage tasks and calendar events with Gemini 2.0 AI</p>
                     </motion.div>
-
                     <motion.div
-                      style={styles.featureCard}
-                      whileHover={{ scale: 1.05, y: -5 }}
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                      <div style={styles.featureIcon}>📝</div>
-                      <h3 style={styles.featureTitle}>Intelligent Notes</h3>
-                      <p style={styles.featureText}>Capture thoughts instantly with AI-powered organization and search</p>
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>📅</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>Google Calendar Sync</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Create, modify, and delete calendar events seamlessly with Google Calendar integration</p>
                     </motion.div>
-
                     <motion.div
-                      style={styles.featureCard}
-                      whileHover={{ scale: 1.05, y: -5 }}
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                      <div style={styles.featureIcon}>⚡</div>
-                      <h3 style={styles.featureTitle}>Lightning Fast</h3>
-                      <p style={styles.featureText}>Instantly set up calendar meeting</p>
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>✅</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>Smart Task Manager</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Voice and drag-and-drop task control with persistent storage across sessions</p>
+                    </motion.div>
+                    <motion.div
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>🎯</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>Focus Tools</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Built-in Pomodoro timer with break suggestions and daily productivity summaries</p>
+                    </motion.div>
+                    <motion.div
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>🎵</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>Ambient Workspace</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Optional Spotify music integration for the perfect study atmosphere</p>
+                    </motion.div>
+                    <motion.div
+                      style={{ ...styles.featureCard, padding: '0.9rem', minWidth: 0, maxWidth: 230, height: 160, margin: "0 auto" }}
+                      whileHover={{ scale: 1.04, y: -2 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div style={{...styles.featureIcon, fontSize: '1.9rem', marginBottom: '0.4rem'}}>💬</div>
+                      <h3 style={{...styles.featureTitle, fontSize: '1.12rem', margin: '0 0 0.4rem 0'}}>Natural Language</h3>
+                      <p style={{...styles.featureText, fontSize: '0.95rem'}}>Simply tell Donna what you need - no complex interfaces or learning curves</p>
                     </motion.div>
                   </div>
 
@@ -359,9 +400,9 @@ export default function Landing() {
                     viewport={{ root: containerRef }}
                   >
                     <p style={styles.descriptionText}>
-                      Donna is your all-in-one personal workspace, powered by an intelligent AI assistant that adapts to your unique workflow. 
-                      Whether you're managing daily tasks, planning projects, or staying connected with your team, Donna evolves with you — 
-                      becoming smarter and more helpful every day.
+                      Donna is your intelligent AI productivity assistant that combines task management, calendar integration, and focus tools 
+                      in one clean interface. Powered by Gemini 2.0, Donna understands natural language and helps you stay organized 
+                      with Google Calendar sync, smart task management, Pomodoro timers, and ambient music — all designed to boost your productivity.
                     </p>
                   </motion.div>
 
@@ -369,17 +410,20 @@ export default function Landing() {
               </div>
             </motion.div>
           </div>
+          {/* Stars animation only in night mode, after loading */}
+          {theme === 'night' && <Stars />}
+          
+          {/* Footer at the bottom with proper spacing */}
+          <div style={{ position: "relative", width: "100%", marginTop: "auto" }}>
+            <Footer
+              theme={theme}
+              toggleTheme={toggleTheme}
+              ThemeToggle={ThemeToggle}
+            />
+          </div>
+          {/* "Scroll to learn more" fixed at bottom of page */}
+          <ScrollIndicator containerRef={containerRef} aboutSectionRef={aboutSectionRef} fixedBottom />
         </>
-      )}
-      {/* Stars animation only in night mode, after loading */}
-      {showAfterLoad && theme === 'night' && <Stars />}
-      {/* Footer only after loading, pass theme/toggleTheme/ThemeToggle */}
-      {showAfterLoad && (
-        <Footer
-          theme={theme}
-          toggleTheme={toggleTheme}
-          ThemeToggle={ThemeToggle}
-        />
       )}
       {/* Add theme background CSS */}
       <style>{`
@@ -402,7 +446,123 @@ export default function Landing() {
           padding: 0;
           word-break: break-word;
         }
+        .scroll-to-learn-more:active,
+        .scroll-to-learn-more:focus {
+          color: var(--color-accent, #e07a5f);
+          outline: none;
+        }
+        .scroll-to-learn-more:hover {
+          color: var(--color-accent, #e07a5f);
+        }
+        .caret-down {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-top: 0.1em;
+          height: 22px;
+        }
+        .caret-down svg path {
+          transition: stroke 0.2s;
+        }
+        .scroll-to-learn-more:hover .caret-down svg path,
+        .scroll-to-learn-more:focus .caret-down svg path {
+          stroke: var(--color-accent, #e07a5f);
+        }
+        .caret-down svg {
+          animation: caret-bounce 1.2s infinite;
+        }
+        @keyframes caret-bounce {
+          0%, 100% { transform: translateY(0);}
+          50% { transform: translateY(7px);}
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translate(-50%, 30px);}
+          to { opacity: 0.92; transform: translate(-50%, 0);}
+        }
       `}</style>
+    </div>
+  );
+}
+
+// ScrollIndicator component
+function ScrollIndicator({ containerRef, aboutSectionRef, fixedBottom }) {
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    function onScroll() {
+      if (!containerRef.current || !aboutSectionRef.current) return;
+      const container = containerRef.current;
+      const aboutRect = aboutSectionRef.current.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      // Hide indicator if about section is visible in viewport
+      setShow(!(aboutRect.top < containerRect.bottom - 200));
+    }
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+    return () => {
+      if (container) container.removeEventListener('scroll', onScroll);
+    };
+  }, [containerRef, aboutSectionRef]);
+
+  if (!show) return null;
+  return (
+    <div
+      style={{
+        position: fixedBottom ? "fixed" : "relative",
+        left: fixedBottom ? "50%" : undefined,
+        bottom: fixedBottom ? "40px" : undefined,
+        transform: fixedBottom ? "translateX(-50%)" : undefined,
+        marginTop: fixedBottom ? undefined : "2.2rem",
+        background: "none",
+        color: "var(--color-text-main, #222)",
+        padding: 0,
+        borderRadius: 0,
+        boxShadow: "none",
+        fontSize: "1.05rem",
+        fontWeight: 500,
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "0.1em",
+        border: "none",
+        opacity: 0.98,
+        userSelect: "none",
+        outline: "none",
+        zIndex: 100
+      }}
+      onClick={() => {
+        if (aboutSectionRef.current) {
+          aboutSectionRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }}
+      className="scroll-to-learn-more"
+      title="Scroll to learn more"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === "Enter" || e.key === " ") {
+        if (aboutSectionRef.current) {
+          aboutSectionRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }}}
+    >
+      <span style={{
+        letterSpacing: "0.01em",
+        fontWeight: 500,
+        fontSize: "1em",
+        background: "none",
+        padding: 0,
+        margin: 0,
+        color: "var(--color-text-main, #222)"
+      }}>Scroll to learn more</span>
+      {/* Minimal caret (^) animated */}
+      <span className="caret-down" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M6 10L11 15L16 10" stroke="var(--color-accent, #e07a5f)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </span>
     </div>
   );
 }
@@ -529,7 +689,7 @@ const styles = {
     scaleX: 0,
     transition: 'scaleX 0.45s cubic-bezier(.77,0,.18,1)'
   },
-  // New enhanced about section styles
+  // Enhanced about section styles with 6 features
   aboutContainer: {
     maxWidth: '1200px',
     width: '100%',
@@ -549,39 +709,48 @@ const styles = {
   aboutContent: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '3rem',
+    gap: '2rem',
+    alignItems: 'center'
   },
   featureGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '2rem',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '2.2rem', // increased gap for more spacing
     marginBottom: '2rem',
+    justifyItems: 'center',
+    alignItems: 'center',
+    margin: '0 auto',
+    maxWidth: 900 // allow more space for the grid
   },
   featureCard: {
-    backgroundColor: ' rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     backdropFilter: 'blur(10px)',
     border: '1px solid var(--color-border-light, rgba(255, 255, 255, 0.2))',
     borderRadius: '20px',
-    padding: '2rem',
+    padding: '1.1rem', // more padding for airiness
     textAlign: 'center',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
+    minWidth: 0,
+    maxWidth: 230,
+    height: 160,
+    margin: "0 auto"
   },
   featureIcon: {
-    fontSize: '3rem',
-    marginBottom: '1rem',
+    fontSize: '1.9rem', // slightly larger
+    marginBottom: '0.4rem',
     display: 'block',
   },
   featureTitle: {
-    fontSize: '1.5rem',
+    fontSize: '1.12rem', // slightly larger
     fontWeight: '600',
-    margin: '0 0 1rem 0',
+    margin: '0 0 0.4rem 0',
     color: 'var(--color-text-main)',
   },
   featureText: {
-    fontSize: '1rem',
+    fontSize: '0.95rem', // slightly larger
     color: 'var(--color-text-secondary, var(--color-text-main))',
-    lineHeight: '1.6',
+    lineHeight: '1.5',
     margin: 0,
     opacity: 0.8,
   },

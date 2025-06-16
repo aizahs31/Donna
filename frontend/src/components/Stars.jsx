@@ -5,8 +5,8 @@ export default function Starfield({
   maxSpeed = 30,
   minDelay = 1200,
   maxDelay = 4200,
-  starColor = "#9E00FF",
-  trailColor = "#2EB9DF",
+  starColor = "#ffffff",
+  trailColor = "#ffffff",
   starWidth = 10,
   starHeight = 1,
   starDensity = 0.00015,
@@ -42,7 +42,7 @@ export default function Starfield({
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 0.05 + 0.5,
+        radius: Math.random() * 1 + 0.5,
         opacity: Math.random() * 0.5 + 0.5,
         twinkleSpeed: shouldTwinkle ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed) : null,
       };
@@ -174,7 +174,7 @@ export default function Starfield({
           starsRef.current.push({
             x: Math.random() * w - w / 2,
             y: Math.random() * h - h / 2,
-            radius: Math.random() * 0.05 + 0.5,
+            radius: Math.random() * 1 + 0.5,
             opacity: Math.random() * 0.5 + 0.5,
             twinkleSpeed: null,
           });
