@@ -2,17 +2,17 @@
 Donna is a smart, AI-powered workspace that helps you manage tasks, calendar events, and focus time — all in one clean, interactive interface.
 
 ## ✨ Features
-🤖 AI Chat Assistance: Add/update/delete tasks & events via natural language
+AI Chat Agent: Add/update/delete tasks & events via natural language
 
-✅ Task Manager: Voice* + UI control, rearrange task order, persistent storage
+Task Manager: Voice* + UI control, rearrange task order, persistent storage
 
-📅 Calendar Sync: Google Calendar integration (create, modify, delete events directly)
+Calendar Sync: Google Calendar integration (create, modify, delete events directly)
 
-🎯 Focus Tools: Pomodoro timer, break times, progress reports* & Donna's integration*
+Focus Tools: Pomodoro timer, break times, progress reports* & Donna's integration*
 
-🎵 Ambient Workspace: Optional Spotify music, quotes, responsive design
+Ambient Workspace: Optional Spotify music, quotes, responsive design
 
-🌈 Themes: Preset themes for customisation
+Themes: Preset themes for customisation
 
 *_to be implimented_
 
@@ -58,4 +58,4 @@ cd ../frontend && npm run dev
 
 “Cancel my 2 PM meeting”
 
-Built with ❤️ by the Ryze.
+Built with ❤️ by Shaz.
