@@ -5,33 +5,67 @@ const axios = require("axios");
 require("dotenv").config();
 const { google } = require('googleapis');
 const marked = require('marked');
-const fs = require('fs');
+const rateLimit = require('express-rate-limit');
 
-const { getAuthUrl, getTokens, oauth2Client } = require('./auth');
+const {
+  getAuthUrl, exchangeCode, createSessionToken, issueLoginCode, redeemLoginCode,
+  attachGoogleAuth, requireGoogleAuth, isAuthError, forgetToken, revokeToken,
+} = require('./auth');
 const app = express();
-const port =  3000;
+const port = process.env.PORT || 3000;
+const DEFAULT_TIME_ZONE = "Asia/Kolkata";
 
-// Fix CORS to match Vite frontend port
+// Accept only valid IANA zones from clients; fall back to the default.
+const resolveTimeZone = (tz) => {
+  if (typeof tz !== 'string' || !tz) return DEFAULT_TIME_ZONE;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz });
+    return tz;
+  } catch {
+    return DEFAULT_TIME_ZONE;
+  }
+};
+
+// Behind Render's proxy, use X-Forwarded-For for client IPs (rate limiting)
+app.set('trust proxy', 1);
+
+// Only the frontend may call the API. Auth travels in the Authorization header, not cookies.
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   methods: ["POST", "GET", "DELETE"],
-  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '100kb' }));
 
-const TOKEN_PATH = './token.json';
+// Resolve the caller's Google session (if any) on every request
+app.use(attachGoogleAuth);
 
-// Load tokens from disk if available
-if (fs.existsSync(TOKEN_PATH)) {
-  try {
-    const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
-    oauth2Client.setCredentials(tokens);
-    console.log('✅ Loaded Google OAuth tokens from /tmp.');
-  } catch (e) {
-    console.error('Failed to load tokens from /tmp', e);
-  }
-}
+const AUTH_REQUIRED_REPLY = {
+  reply: "I need access to your Google Calendar for that. Click <strong>Connect Google Calendar</strong> in the Calendar panel, then ask me again.",
+  action: "auth_required",
+};
+
+// Google rejected this user's refresh token: drop the cached client and ask them to reconnect.
+const sendAuthExpired = (req, res, asChat = false) => {
+  if (req.sessionToken) forgetToken(req.sessionToken);
+  return asChat
+    ? res.json(AUTH_REQUIRED_REPLY)
+    : res.status(401).json({ error: 'Google session expired. Please reconnect.', code: 'auth_required' });
+};
+
+// Throttle login attempts per IP
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false });
+
+// Protect the Gemini quota: 20 chat requests per minute per IP
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { reply: "You're going a bit fast for me. Give me a moment and try again." },
+});
+
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -49,7 +83,7 @@ When processing requests, respond ONLY in the following JSON formats:
     "start": "2024-03-20T14:00:00",
     "end": "2024-03-20T15:00:00",
     "description": "",
-    "timeZone": "Asia/Kolkata",
+    "timeZone": "<the user's time zone given in the message context>",
     "query": "Optional search term if updating an existing event"
   }
 }
@@ -85,29 +119,35 @@ When processing requests, respond ONLY in the following JSON formats:
 
 Use current date/time context for terms like "tomorrow". For all other questions, respond conversationally like a warm friend.`
 
-app.post("/chat", async (req, res) => {
-  const { message, context = [], tasks = [] } = req.body;
+app.post("/chat", chatLimiter, async (req, res) => {
+  const { message, context = [], tasks = [] } = req.body || {};
+
+  if (typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ error: "Message is required." });
+  }
 
   try {
     const now = new Date();
-    const timeZone = "Asia/Kolkata";
+    const timeZone = resolveTimeZone(req.body.timeZone);
     const messageWithContext = `[Current date and time: ${now.toLocaleString("en-US", { timeZone })} | Time Zone: ${timeZone}]
 ${message}
 
 Here are the user's current tasks:
-${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).join("\n")}`;
+${(Array.isArray(tasks) ? tasks : []).map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).join("\n")}`;
+
+    // Keep only well-formed recent turns from the client
+    const history = (Array.isArray(context) ? context : [])
+      .filter(c => (c?.role === "user" || c?.role === "model") && Array.isArray(c.parts))
+      .slice(-10);
 
     const contents = [
-      { role: "model", parts: [{ text: systemPrompt }] },
-      ...context,
+      ...history,
       { role: "user", parts: [{ text: messageWithContext }] }
     ];
 
-    console.log("Sending to Gemini:", contents);
-
     const response = await axios.post(
       GEMINI_URL,
-      { contents },
+      { systemInstruction: { parts: [{ text: systemPrompt }] }, contents },
       { headers: { "Content-Type": "application/json" } }
     );
 
@@ -126,20 +166,26 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
       console.warn("Failed JSON parsing:", e);
     }
 
+    const isCalendarIntent = jsonResponse?.type === "calendar_event" || jsonResponse?.type === "delete_calendar_event";
+    if (isCalendarIntent && !req.googleAuth) {
+      return res.json(AUTH_REQUIRED_REPLY);
+    }
+
     if (jsonResponse) {
-      const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+      const calendar = req.googleAuth ? google.calendar({ version: 'v3', auth: req.googleAuth }) : null;
 
       switch (jsonResponse.type) {
         case "calendar_event":
           try {
-            const { summary, start, end, description, timeZone: tz, query } = jsonResponse.event;
+            const { summary, start, end, description, timeZone: tz, query } = jsonResponse.event || {};
             if (!start || !end) throw new Error("Missing start or end time");
+            const eventTimeZone = resolveTimeZone(tz || timeZone);
 
             const eventPayload = {
               summary,
               description,
-              start: { dateTime: start, timeZone: tz || timeZone },
-              end: { dateTime: end, timeZone: tz || timeZone },
+              start: { dateTime: start, timeZone: eventTimeZone },
+              end: { dateTime: end, timeZone: eventTimeZone },
               reminders: {
                 useDefault: false,
                 overrides: [{ method: 'popup', minutes: 10 }]
@@ -163,7 +209,7 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
                   eventId: existingEvent.id,
                   resource: { ...existingEvent, ...eventPayload }
                 });
-                console.log("Event updated:", updated.data);
+                console.log("Event updated:", updated.data.id);
                 return res.json({ reply: "Done! I've updated the event.", action: "calendar_updated" });
               } else {
                 return res.json({ reply: "I couldn't find the event to update." });
@@ -174,12 +220,13 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
                 calendarId: 'primary',
                 resource: eventPayload
               });
-              console.log("Calendar event created:", created.data);
+              console.log("Calendar event created:", created.data.id);
               return res.json({ reply: "Done! The event has been scheduled.", action: "calendar_created" });
             }
 
           } catch (calendarError) {
-            console.error("Calendar creation/update failed:", calendarError);
+            if (isAuthError(calendarError)) return sendAuthExpired(req, res, true);
+            console.error("Calendar creation/update failed:", calendarError.message);
             return res.json({ reply: "Sorry, I couldn't schedule or update the event." });
           }
 
@@ -195,19 +242,21 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
               orderBy: 'startTime'
             });
 
-            const events = search.data.items;
-            if (events.length > 0) {
+            const events = search.data.items || [];
+            if (query && events.length > 0) {
               await calendar.events.delete({ calendarId: 'primary', eventId: events[0].id });
               return res.json({ reply: `Done! I deleted \"${events[0].summary}\".`, action: "calendar_deleted" });
             } else {
               return res.json({ reply: "Couldn't find any matching events." });
             }
           } catch (calendarError) {
-            console.error("Delete failed:", calendarError);
+            if (isAuthError(calendarError)) return sendAuthExpired(req, res, true);
+            console.error("Delete failed:", calendarError.message);
             return res.json({ reply: "Sorry, I couldn't delete the event." });
           }
 
         case "add_task":
+          if (!jsonResponse.task?.text) break;
           return res.json({
             reply: `Done! I’ve added “${jsonResponse.task.text}” to your tasks.`,
             action: "task_added",
@@ -215,6 +264,7 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
           });
 
         case "update_task":
+          if (!jsonResponse.task?.query) break;
           return res.json({
             reply: "Done! I’ve updated your task.",
             action: "task_updated",
@@ -222,6 +272,7 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
           });
 
         case "delete_task":
+          if (!jsonResponse.query) break;
           return res.json({
             reply: "Done! I’ve deleted the task.",
             action: "task_deleted",
@@ -244,76 +295,126 @@ ${tasks.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "✓" : "✗"}]`).jo
 
 
 // Auth routes
-app.get('/auth', (req, res) => {
-  const url = getAuthUrl();
-  res.redirect(url);
+//
+// Login flow:
+// 1. Frontend makes a random `state`, keeps it in sessionStorage, opens GET /auth?state=...
+// 2. Google redirects to /auth/callback?code=...&state=...
+// 3. Backend seals the user's refresh token into a session token and redirects to
+//    FRONTEND_URL/workspace#login_code=<one-time code>&state=<state>
+// 4. Frontend checks `state`, then POSTs the code to /auth/session to receive the session token.
+
+const frontendRedirect = (res, params) => {
+  const hash = new URLSearchParams(params).toString();
+  res.redirect(`${process.env.FRONTEND_URL}/workspace#${hash}`);
+};
+
+app.get('/auth', authLimiter, (req, res) => {
+  const state = typeof req.query.state === 'string' ? req.query.state : '';
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(state)) {
+    return res.status(400).send('Missing or invalid state');
+  }
+  res.redirect(getAuthUrl(state));
 });
 
-app.get('/auth/callback', async (req, res) => {
-  const code = req.query.code;
+app.get('/auth/callback', authLimiter, async (req, res) => {
+  const { code, state = '', error } = req.query;
+  if (error || !code) {
+    return frontendRedirect(res, { auth_error: String(error || 'missing_code'), state });
+  }
   try {
-    const tokens = await getTokens(code);
-    oauth2Client.setCredentials(tokens);
-    // Always update token.json with the latest tokens
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
-    // Redirect to frontend workspace after successful auth
-    res.redirect(`${process.env.FRONTEND_URL}/workspace`);
+    const tokens = await exchangeCode(String(code));
+    if (!tokens.refresh_token) {
+      // Should not happen with prompt=consent, but without it we cannot keep the session.
+      return frontendRedirect(res, { auth_error: 'no_refresh_token', state });
+    }
+    const loginCode = issueLoginCode(createSessionToken(tokens.refresh_token));
+    frontendRedirect(res, { login_code: loginCode, state });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Authentication failed');
+    console.error('OAuth code exchange failed:', err?.response?.data || err.message);
+    frontendRedirect(res, { auth_error: 'exchange_failed', state });
   }
 });
 
-// Also update token.json if tokens are refreshed automatically
-oauth2Client.on('tokens', (tokens) => {
-  if (tokens.refresh_token || tokens.access_token) {
-    try {
-      // Merge with existing tokens if needed
-      let current = {};
-      if (fs.existsSync(TOKEN_PATH)) {
-        current = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
-      }
-      const updated = { ...current, ...tokens };
-      fs.writeFileSync(TOKEN_PATH, JSON.stringify(updated));
-      console.log('✅ Google OAuth tokens updated on disk.');
-    } catch (e) {
-      console.error('Failed to update tokens on disk:', e);
-    }
+// Swap the one-time login code for the long-lived session token.
+app.post('/auth/session', authLimiter, (req, res) => {
+  const code = req.body?.code;
+  const sessionToken = typeof code === 'string' ? redeemLoginCode(code) : null;
+  if (!sessionToken) {
+    return res.status(400).json({ error: 'Login code is invalid or expired. Please connect again.' });
   }
+  res.json({ token: sessionToken });
+});
+
+// Is this browser's session valid? (Does not call Google.)
+app.get('/auth/status', (req, res) => {
+  res.json({ connected: !!req.googleAuth });
+});
+
+// Disconnect: revoke the refresh token at Google so the session token is useless everywhere.
+app.post('/auth/logout', async (req, res) => {
+  if (req.sessionToken) await revokeToken(req.sessionToken);
+  res.json({ connected: false });
 });
 
 // Calendar routes
-app.get('/events', async (req, res) => {
+
+// Window for GET /events. Prefer explicit timeMin/timeMax from the client (computed in the
+// user's local time); otherwise derive one from range=today|week|month in server time.
+function getEventWindow({ range, timeMin, timeMax } = {}) {
+  const isValid = (v) => typeof v === 'string' && !Number.isNaN(Date.parse(v));
+  if (isValid(timeMin) && isValid(timeMax) && Date.parse(timeMin) < Date.parse(timeMax)) {
+    return { timeMin: new Date(timeMin).toISOString(), timeMax: new Date(timeMax).toISOString() };
+  }
+  const now = new Date();
+  const start = new Date(now);
+  const end = new Date(now);
+  if (range === 'week') {
+    start.setDate(now.getDate() - now.getDay());
+    end.setTime(start.getTime());
+    end.setDate(start.getDate() + 6);
+  } else if (range === 'month') {
+    start.setDate(1);
+    end.setMonth(now.getMonth() + 1, 0);
+  }
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+  return { timeMin: start.toISOString(), timeMax: end.toISOString() };
+}
+app.get('/events', requireGoogleAuth, async (req, res) => {
   try {
-    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-    const now = new Date();
+    const calendar = google.calendar({ version: 'v3', auth: req.googleAuth });
+    const { timeMin, timeMax } = getEventWindow(req.query);
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: now.toISOString(),
-      maxResults: 10,
+      timeMin,
+      timeMax,
+      timeZone: resolveTimeZone(req.query.timeZone),
+      maxResults: 250,
       singleEvents: true,
       orderBy: 'startTime',
     });
 
-    res.json(response.data.items);
+    res.json(response.data.items || []);
   } catch (err) {
-    console.error('Error fetching events:', err);
+    if (isAuthError(err)) return sendAuthExpired(req, res);
+    console.error('Error fetching events:', err.message);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
 });
 
 // Add event to Google Calendar
-app.post('/events', async (req, res) => {
+app.post('/events', requireGoogleAuth, async (req, res) => {
   try {
-    const { summary, start, end, repeat, notification } = req.body;
+    const { summary, start, end, repeat, notification } = req.body || {};
+    const timeZone = resolveTimeZone(req.body?.timeZone);
     if (!summary || !start || !end) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    const calendar = google.calendar({ version: 'v3', auth: req.googleAuth });
     const event = {
       summary,
-      start: { dateTime: start },
-      end: { dateTime: end },
+      start: { dateTime: start, timeZone },
+      end: { dateTime: end, timeZone },
       reminders: {
         useDefault: false,
         overrides: [
@@ -335,16 +436,17 @@ app.post('/events', async (req, res) => {
     });
     res.status(201).json(response.data);
   } catch (err) {
-    console.error('Error creating event:', err);
+    if (isAuthError(err)) return sendAuthExpired(req, res);
+    console.error('Error creating event:', err.message);
     res.status(500).json({ error: 'Failed to create event' });
   }
 });
 
 // Delete calendar event
-app.delete('/events/:eventId', async (req, res) => {
+app.delete('/events/:eventId', requireGoogleAuth, async (req, res) => {
   try {
     const { eventId } = req.params;
-    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    const calendar = google.calendar({ version: 'v3', auth: req.googleAuth });
     
     await calendar.events.delete({
       calendarId: 'primary',
@@ -353,7 +455,8 @@ app.delete('/events/:eventId', async (req, res) => {
     
     res.json({ message: 'Event deleted successfully' });
   } catch (err) {
-    console.error('Error deleting event:', err);
+    if (isAuthError(err)) return sendAuthExpired(req, res);
+    console.error('Error deleting event:', err.message);
     res.status(500).json({ error: 'Failed to delete event' });
   }
 });

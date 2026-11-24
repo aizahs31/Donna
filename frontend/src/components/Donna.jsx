@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import DOMPurify from "dompurify";
+import { USER_TIME_ZONE } from "../config";
+import { apiFetch, authReady, clearSession } from "../utils/session";
+import { newTaskId, readTasks, writeTasks, findTaskIndex } from "../utils/tasks";
 
 const Donna = ({ calendarRef }) => {
   const [messages, setMessages] = useState([]);
@@ -19,33 +23,34 @@ const Donna = ({ calendarRef }) => {
       parts: [{ text: m.text }]
     }));
 
-    let tasks = [];
-    try {
-      tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    } catch (e) {
-      console.warn("Failed to parse tasks from localStorage", e);
-      tasks = [];
-    }
+    const tasks = readTasks().map(({ text, completed }) => ({ text, completed }));
 
     try {
-      const res = await fetch('https://donna-1677.onrender.com/chat', {
+      await authReady;
+      const res = await apiFetch('/chat', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: input,
           context: contextMessages,
-          tasks: tasks
+          tasks: tasks,
+          timeZone: USER_TIME_ZONE
         })
       });
 
       const data = await res.json();
-      const botMessage = { from: "bot", text: data.reply };
+      const botMessage = { from: "bot", text: data.reply || data.error || "Sorry, something went wrong." };
       setMessages((prev) => [...prev, botMessage]);
       
       // Handle different actions
       if (data.action) {
         switch (data.action) {
+          case "auth_required":
+            // Session missing or rejected by Google: Calendar panel will show "Connect"
+            clearSession();
+            break;
           case "calendar_created":
+          case "calendar_updated":
           case "calendar_deleted":
             // Reload calendar events
             if (calendarRef?.current) {
@@ -54,44 +59,39 @@ const Donna = ({ calendarRef }) => {
             break;
           case "task_added":
             // Add task to local storage
-            if (data.taskData) {
-              const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-              const newTasks = [...existingTasks, data.taskData];
-              localStorage.setItem('tasks', JSON.stringify(newTasks));
-              // Trigger a custom event to notify Task component
-              window.dispatchEvent(new CustomEvent('tasksUpdated'));
+            if (data.taskData?.text) {
+              const newTask = { id: newTaskId(), text: data.taskData.text, completed: !!data.taskData.completed };
+              // writeTasks also notifies the Task component via the 'tasksUpdated' event
+              writeTasks([...readTasks(), newTask]);
             }
             break;
           case "task_updated":
             // Update task in local storage
-            if (data.taskData) {
-              const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-              const query = data.taskData.query.toLowerCase();
-              const taskIndex = existingTasks.findIndex(task => 
-                task.text.toLowerCase().includes(query)
-              );
+            if (data.taskData?.query) {
+              const existingTasks = readTasks();
+              const taskIndex = findTaskIndex(existingTasks, data.taskData.query);
+              const updates = data.taskData.updates || {};
               if (taskIndex !== -1) {
-                if (data.taskData.updates.text) {
-                  existingTasks[taskIndex].text = data.taskData.updates.text;
+                if (updates.text) {
+                  existingTasks[taskIndex].text = updates.text;
                 }
-                if (data.taskData.updates.completed !== undefined) {
-                  existingTasks[taskIndex].completed = data.taskData.updates.completed;
+                if (updates.completed !== undefined) {
+                  existingTasks[taskIndex].completed = updates.completed;
                 }
-                localStorage.setItem('tasks', JSON.stringify(existingTasks));
-                window.dispatchEvent(new CustomEvent('tasksUpdated'));
+                writeTasks(existingTasks);
               }
             }
             break;
           case "task_deleted":
             // Delete task from local storage
             if (data.query) {
-              const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-              const query = data.query.toLowerCase();
-              const filteredTasks = existingTasks.filter(task => 
-                !task.text.toLowerCase().includes(query)
-              );
-              localStorage.setItem('tasks', JSON.stringify(filteredTasks));
-              window.dispatchEvent(new CustomEvent('tasksUpdated'));
+              // Delete only the best match, not every task containing the query
+              const existingTasks = readTasks();
+              const taskIndex = findTaskIndex(existingTasks, data.query);
+              if (taskIndex !== -1) {
+                existingTasks.splice(taskIndex, 1);
+                writeTasks(existingTasks);
+              }
             }
             break;
         }
@@ -214,7 +214,7 @@ const Donna = ({ calendarRef }) => {
           msg.from === 'user' ? (
             <div key={index} style={userMsgStyle}>{msg.text}</div>
           ) : (
-            <div key={index} style={botMsgStyle} dangerouslySetInnerHTML={{ __html: msg.text }} />
+            <div key={index} style={botMsgStyle} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.text) }} />
           )
         )}
         {loading && (

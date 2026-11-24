@@ -1,20 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import { newTaskId, readTasks, writeTasks } from '../utils/tasks';
 
 const TaskList = () => {
-  const [tasks, setTasks] = useState([]);
+  // Load synchronously so the first persist never overwrites saved tasks with []
+  const [tasks, setTasks] = useState(readTasks);
   const [isAdding, setIsAdding] = useState(false);
   const inputRef = useRef(null);
   const [draggedIndex, setDraggedIndex] = useState(null);
 
+  // Persist every change, including an empty list. Blank drafts are not saved.
   useEffect(() => {
-    const saved = localStorage.getItem('tasks');
-    if (saved) setTasks(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    if (tasks.length > 0) {
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
+    writeTasks(tasks.filter(t => t.text.trim() !== ''), { notify: false });
   }, [tasks]);
 
   useEffect(() => {
@@ -26,10 +22,8 @@ const TaskList = () => {
   // Listen for task updates from Donna
   useEffect(() => {
     const handleTasksUpdated = () => {
-      const saved = localStorage.getItem('tasks');
-      if (saved) {
-        setTasks(JSON.parse(saved));
-      }
+      setTasks(readTasks());
+      setIsAdding(false);
     };
 
     window.addEventListener('tasksUpdated', handleTasksUpdated);
@@ -38,26 +32,19 @@ const TaskList = () => {
 
   const addTask = () => {
     setIsAdding(true);
-    setTasks([...tasks, { text: '', completed: false }]);
+    setTasks([...tasks, { id: newTaskId(), text: '', completed: false }]);
   };
 
-  const finalizeTask = (index, text) => {
-    if (text.trim() === '') {
-      const updated = [...tasks];
-      updated.splice(index, 1);
-      setTasks(updated);
-    } else {
-      const updated = [...tasks];
-      updated[index].text = text;
-      setTasks(updated);
-    }
+  const finalizeTask = (id, text) => {
+    setTasks(prev => text.trim() === ''
+      ? prev.filter(t => t.id !== id)
+      // Clear the editing flag so the row leaves edit mode
+      : prev.map(t => t.id === id ? { ...t, text, editing: false } : t));
     setIsAdding(false);
   };
 
-  const toggleTask = (index) => {
-    const updated = [...tasks];
-    updated[index].completed = !updated[index].completed;
-    setTasks(updated);
+  const toggleTask = (id) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
   };
 
   const styles = {
@@ -192,7 +179,7 @@ const TaskList = () => {
       <ul style={styles.list}>
         {tasks.map((task, index) => (
           <li
-            key={index}
+            key={task.id}
             style={{
               ...styles.item,
               ...(draggedIndex === index ? styles.dragging : {}),
@@ -233,7 +220,7 @@ const TaskList = () => {
                 ...styles.checkbox,
                 ...(task.completed ? styles.checkboxChecked : {}),
               }}
-              onClick={e => { e.stopPropagation(); toggleTask(index); }}
+              onClick={e => { e.stopPropagation(); toggleTask(task.id); }}
             >
               {task.completed && (
                 <svg viewBox="0 0 24 24" style={styles.checkmarkSvg}>
@@ -246,9 +233,9 @@ const TaskList = () => {
                 ref={inputRef}
                 style={styles.input}
                 defaultValue={task.text}
-                onBlur={e => finalizeTask(index, e.target.value)}
+                onBlur={e => finalizeTask(task.id, e.target.value)}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') finalizeTask(index, e.target.value);
+                  if (e.key === 'Enter') e.currentTarget.blur();
                 }}
                 onClick={e => e.stopPropagation()}
                 autoFocus
@@ -263,12 +250,7 @@ const TaskList = () => {
               style={styles.deleteBtn}
               onClick={e => {
                 e.stopPropagation();
-                setTasks(tasks => {
-                  const updated = [...tasks];
-                  updated.splice(index, 1);
-                  localStorage.setItem('tasks', JSON.stringify(updated));
-                  return updated;
-                });
+                setTasks(prev => prev.filter(t => t.id !== task.id));
               }}
               title="Delete task"
             >

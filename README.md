@@ -37,6 +37,12 @@ GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 REDIRECT_URI=http://localhost:3000/auth/callback
 FRONTEND_URL=http://localhost:5173
+SESSION_SECRET=...   # long random string, e.g. `openssl rand -hex 32`
+```
+Each user connects their own Google Calendar. Their refresh token is encrypted with `SESSION_SECRET` into a session token kept in their browser; the server stores no tokens. Changing `SESSION_SECRET` signs everyone out.
+Optional: create a .env in /frontend to point at a local backend (defaults to the hosted one):
+```
+VITE_API_URL=http://localhost:3000
 ```
 Run the app:
 ```

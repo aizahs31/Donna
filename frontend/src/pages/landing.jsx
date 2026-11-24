@@ -5,6 +5,7 @@ import ScrollReveal from '../components/ScrollReveal';
 import Footer from '../components/Footer';
 import Stars from '../components/Stars';
 import ThemeToggle from '../components/ThemeToggle';
+import { isConnected, startLogin } from '../utils/session';
 
 export default function Landing() {
   const [loading, setLoading] = useState(true);
@@ -239,7 +240,7 @@ export default function Landing() {
                   }}
                 >
                   <motion.button
-                    onClick={() => window.location.href = 'https://donna-1677.onrender.com/auth'}
+                    onClick={() => (isConnected() ? (window.location.href = '/workspace') : startLogin())}
                     style={styles.connectButton}
                     whileHover="hover"
                     initial="rest"
